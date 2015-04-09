@@ -1,0 +1,4 @@
+.settings
+/community-server/*.classpath
+/community-server/*.project
+/community-server/target
