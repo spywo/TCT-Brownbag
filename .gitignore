@@ -2,3 +2,8 @@
 /community-server/*.classpath
 /community-server/*.project
 /community-server/target
+/community-mobile/gen
+/community-mobile/bin
+/community-mobile/*.classpath
+/community-mobile/*.project
+/community-mobile/*.log
