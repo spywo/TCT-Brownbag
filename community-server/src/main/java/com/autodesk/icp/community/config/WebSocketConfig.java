@@ -22,10 +22,16 @@
 //
 package com.autodesk.icp.community.config;
 
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.messaging.Message;
+import org.springframework.messaging.MessageChannel;
+import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
+import org.springframework.messaging.support.ChannelInterceptorAdapter;
 import org.springframework.web.socket.WebSocketHandler;
 import org.springframework.web.socket.config.annotation.EnableWebSocket;
 import org.springframework.web.socket.config.annotation.WebSocketConfigurer;
@@ -36,7 +42,7 @@ import com.autodesk.icp.community.web.CommonTextHandler;
 import com.autodesk.icp.community.web.HandshakeInterceptor;
 
 /**
- * The configurer of the Web Scoket endpoints.
+ * The configurer of the Web Socket endpoints.
  * 
  * @author Oliver Wu
  */

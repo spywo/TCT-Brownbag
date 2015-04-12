@@ -30,6 +30,8 @@ import org.springframework.context.annotation.Configuration;
  * @author Oliver Wu
  */
 @Configuration
+//@ComponentScan(basePackages = "com.autodesk.icp", excludeFilters = { @ComponentScan.Filter(value = Controller.class, type = FilterType.ANNOTATION),
+//                                                                 @ComponentScan.Filter(value = Configuration.class, type = FilterType.ANNOTATION) })
 public class AppConfig {
-
+   
 }

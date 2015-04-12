@@ -53,8 +53,8 @@ public class DispatcherServletInitializer implements WebApplicationInitializer {
 
         // Register and map the dispatcher servlet
         Dynamic dispatcher = container.addServlet("dispatcher", new DispatcherServlet(dispatcherContext));
+        dispatcher.setAsyncSupported(true);
         dispatcher.setLoadOnStartup(1);
-        dispatcher.addMapping("/");
+        dispatcher.addMapping("/");        
     }
-
 }
