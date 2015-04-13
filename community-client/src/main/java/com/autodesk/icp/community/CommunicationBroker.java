@@ -29,13 +29,13 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.messaging.converter.MappingJackson2MessageConverter;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.socket.WebSocketHttpHeaders;
-import org.springframework.web.socket.client.standard.StandardWebSocketClient;
 import org.springframework.web.socket.sockjs.client.RestTemplateXhrTransport;
 import org.springframework.web.socket.sockjs.client.SockJsClient;
 import org.springframework.web.socket.sockjs.client.Transport;
-import org.springframework.web.socket.sockjs.client.WebSocketTransport;
 
 import com.autodesk.icp.community.stomp.WebSocketStompClient;
 
@@ -44,12 +44,12 @@ import com.autodesk.icp.community.stomp.WebSocketStompClient;
  */
 public class CommunicationBroker {
     private static final Logger LOGGER = LoggerFactory.getLogger(WebSocketStompClient.class);
-    
+
     private volatile static WebSocketStompClient client;
-    
+
     public static WebSocketStompClient getInstance() {
         if (client == null) {
-            synchronized(CommunicationBroker.class) {
+            synchronized (CommunicationBroker.class) {
                 if (client == null) {
                     client = getClient("ws://localhost:8080/community/portfolio");
                 }
@@ -60,8 +60,13 @@ public class CommunicationBroker {
 
     public static WebSocketStompClient getClient(String endpointURI) {
         List<Transport> transports = new ArrayList<Transport>(2);
-        transports.add(new WebSocketTransport(new StandardWebSocketClient()));
-        transports.add(new RestTemplateXhrTransport());
+        // transports.add(new WebSocketTransport(new StandardWebSocketClient()));
+
+        RestTemplate restTemplate = new RestTemplate(new HttpComponentsClientHttpRequestFactory());
+
+        RestTemplateXhrTransport xhrTransport = new RestTemplateXhrTransport(restTemplate);
+        xhrTransport.setXhrStreamingDisabled(false);
+        transports.add(xhrTransport);
         SockJsClient sockJsClient = new SockJsClient(transports);
 
         WebSocketStompClient client = null;
@@ -73,5 +78,5 @@ public class CommunicationBroker {
         }
 
         return client;
-    }   
+    }
 }

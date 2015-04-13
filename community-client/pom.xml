@@ -10,17 +10,6 @@
 	<artifactId>community-client</artifactId>
 	<dependencies>
 		<dependency>
-			<groupId>org.apache.tomcat</groupId>
-			<artifactId>tomcat-websocket</artifactId>
-			<version>8.0.1</version>
-			<exclusions>
-				<exclusion>
-					<artifactId>tomcat-catalina</artifactId>
-					<groupId>org.apache.tomcat</groupId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-websocket</artifactId>
 		</dependency>
