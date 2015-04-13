@@ -20,12 +20,36 @@
 // Software Restricted Rights) and DFAR 252.227-7013(c)(1)(ii)
 // (Rights in Technical Data and Computer Software), as applicable.
 //
-package com.autodesk.icp.community.mobile.security;
+package com.autodesk.icp.community.controller;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.Payload;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.messaging.simp.annotation.SendToUser;
+import org.springframework.stereotype.Controller;
+
+import com.autodesk.icp.community.common.model.User;
+import com.autodesk.icp.community.service.AuthenticationService;
 
 /**
  * @author Oliver Wu
- *
  */
-public class User {
+@Controller
+public class AuthenticationController {
+
+    @Autowired
+    private SimpMessagingTemplate template;
+
+    @Autowired
+    private AuthenticationService authService;
+
+    @MessageMapping(value = "/login")
+    @SendToUser("/user/queue/login")
+    public User login(@Payload User user) {
+        User authedUser = authService.login(user.getLoginId(), user.getPassword());
+                
+        return authedUser;
+    }
 
 }

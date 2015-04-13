@@ -8,7 +8,10 @@
 
 	<!-- Project Modules -->
 	<modules>
+		<module>community-client</module>
 		<module>community-server</module>
+		<module>community-common</module>
+		<module>community-mobile-android</module>
 	</modules>
 
 	<properties>
@@ -210,6 +213,11 @@
 			</dependency>
 			<dependency>
 				<groupId>org.slf4j</groupId>
+				<artifactId>slf4j-android</artifactId>
+				<version>${slf4j.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.slf4j</groupId>
 				<artifactId>jcl-over-slf4j</artifactId>
 				<version>${slf4j.version}</version>
 			</dependency>
@@ -282,7 +290,7 @@
 				<artifactId>spring-messaging</artifactId>
 				<version>${spring.version}</version>
 			</dependency>
-			
+
 			<!-- Aspectj -->
 			<dependency>
 				<groupId>org.aspectj</groupId>
@@ -371,7 +379,11 @@
 		</dependencies>
 	</dependencyManagement>
 
-	<dependencies>
+	<dependencies>	
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>

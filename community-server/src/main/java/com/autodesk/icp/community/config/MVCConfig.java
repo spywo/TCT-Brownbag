@@ -25,17 +25,15 @@ package com.autodesk.icp.community.config;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.FilterType;
-import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Controller;
 
 /**
- * Application level configurations.
+ * Dispatch Servlet scope configurations.
  * 
  * @author Oliver Wu
  */
 @Configuration
-@ComponentScan(basePackages = "com.autodesk.icp.community", excludeFilters = { @ComponentScan.Filter(value = Service.class, type = FilterType.ANNOTATION),
-                                                                    @ComponentScan.Filter(value = Component.class, type = FilterType.ANNOTATION) })
-public class AppConfig {
-
+@ComponentScan(basePackages = "com.autodesk.icp", includeFilters = { @ComponentScan.Filter(value = Controller.class, type = FilterType.ANNOTATION)})
+public class MVCConfig {
+   
 }

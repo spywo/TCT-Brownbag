@@ -20,23 +20,10 @@
 // Software Restricted Rights) and DFAR 252.227-7013(c)(1)(ii)
 // (Rights in Technical Data and Computer Software), as applicable.
 //
-package com.autodesk.icp.community.web;
+package com.autodesk.icp.community.stomp;
 
-import org.springframework.web.socket.TextMessage;
-import org.springframework.web.socket.WebSocketSession;
-import org.springframework.web.socket.handler.TextWebSocketHandler;
+public interface StompClient {
 
-/**
- * The common text handler.
- * 
- * @author Oliver Wu
- */
-public class CommonTextHandler extends TextWebSocketHandler {
+    public void connect(StompMessageHandler messageHandler);
 
-    @Override
-    protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
-        super.handleTextMessage(session, message);
-        TextMessage returnMessage = new TextMessage(message.getPayload() + " received at server1");        
-        session.sendMessage(returnMessage);
-    }
 }

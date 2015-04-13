@@ -2,6 +2,8 @@ package com.autodesk.icp.community.mobile.activity;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
@@ -31,6 +33,11 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.autodesk.icp.community.CommunicationBroker;
+import com.autodesk.icp.community.common.model.User;
+import com.autodesk.icp.community.mobile.handler.AuthenticationHandler;
+import com.autodesk.icp.community.stomp.WebSocketStompClient;
+
 /**
  * A login screen that offers login via email/password.
  */
@@ -55,7 +62,7 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
         // Set up the login form.
         mNTAccountView = (AutoCompleteTextView)findViewById(R.id.account);
         populateAutoComplete();
-        mNTAccountView.setText(retrieveEmail());
+        mNTAccountView.setText(retrieveAccount());
 
         mPasswordView = (EditText)findViewById(R.id.password);
         mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
@@ -203,14 +210,14 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
 
     @Override
     public void onLoadFinished(Loader<Cursor> cursorLoader, Cursor cursor) {
-        List<String> emails = new ArrayList<String>();
+        List<String> accounts = new ArrayList<String>();
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
-            emails.add(cursor.getString(ProfileQuery.ADDRESS));
+            accounts.add(cursor.getString(ProfileQuery.IDENTITY));
             cursor.moveToNext();
         }
 
-        addEmailsToAutoComplete(emails);
+        addAccountsToAutoComplete(accounts);
     }
 
     @Override
@@ -232,20 +239,20 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
         editor.commit();
     }
 
-    private String retrieveEmail() {
+    private String retrieveAccount() {
         SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
         return settings.getString("login.account", "ads\\");
     }
 
     private interface ProfileQuery {
-        String[] PROJECTION = { ContactsContract.CommonDataKinds.Email.ADDRESS,
-                               ContactsContract.CommonDataKinds.Email.IS_PRIMARY, };
+        String[] PROJECTION = { ContactsContract.CommonDataKinds.Identity.IDENTITY,
+                               ContactsContract.CommonDataKinds.Identity.IS_PRIMARY, };
 
-        int ADDRESS = 0;
+        int IDENTITY = 0;
         int IS_PRIMARY = 1;
     }
 
-    private void addEmailsToAutoComplete(List<String> emailAddressCollection) {
+    private void addAccountsToAutoComplete(List<String> emailAddressCollection) {
         // Create adapter to tell the AutoCompleteTextView what to show in its dropdown list.
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(LoginActivity.this,
                                                                 android.R.layout.simple_dropdown_item_1line,
@@ -269,8 +276,30 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
 
         @Override
         protected Boolean doInBackground(Void... params) {
-            
-            return true;
+            WebSocketStompClient client = CommunicationBroker.getInstance();
+
+            final CountDownLatch latch = new CountDownLatch(1);
+
+            User user = new User();
+            user.setLoginId(mAccount);
+            user.setPassword(mPassword);
+            AuthenticationHandler handler = new AuthenticationHandler(getString(R.string.ws_subscrible_login),
+                                                                      getString(R.string.ws_destination_login),
+                                                                      user,
+                                                                      latch);
+            client.connect(handler);
+
+            try {
+                latch.await(2, TimeUnit.MINUTES);
+            } catch (InterruptedException e) {
+            }
+
+            User authedUser = handler.getPayload();
+            if (authedUser != null && authedUser.isAuthed()) {
+                return true;
+            } else {
+                return false;
+            }
         }
 
         @Override

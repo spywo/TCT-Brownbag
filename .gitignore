@@ -7,3 +7,11 @@
 /community-mobile/*.classpath
 /community-mobile/*.project
 /community-mobile/*.log
+/community-mobile-android/bin
+/community-client/*.project
+/community-client/*.classpath
+/community-client/.gitignore
+/community-common/.classpath
+/community-common/.project
+/community-mobile-android/*.classpath
+/community-mobile-android/*.project

@@ -50,6 +50,7 @@ public class DispatcherServletInitializer implements WebApplicationInitializer {
         // Create the dispatcher servlet's Spring application context
         AnnotationConfigWebApplicationContext dispatcherContext = new AnnotationConfigWebApplicationContext();
         dispatcherContext.register(WebSocketConfig.class);
+        dispatcherContext.register(MVCConfig.class);
 
         // Register and map the dispatcher servlet
         Dynamic dispatcher = container.addServlet("dispatcher", new DispatcherServlet(dispatcherContext));

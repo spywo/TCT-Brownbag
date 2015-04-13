@@ -22,24 +22,11 @@
 //
 package com.autodesk.icp.community.config;
 
-import java.util.Map;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.messaging.Message;
-import org.springframework.messaging.MessageChannel;
-import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
-import org.springframework.messaging.support.ChannelInterceptorAdapter;
-import org.springframework.web.socket.WebSocketHandler;
-import org.springframework.web.socket.config.annotation.EnableWebSocket;
-import org.springframework.web.socket.config.annotation.WebSocketConfigurer;
-import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry;
-import org.springframework.web.socket.server.standard.ServletServerContainerFactoryBean;
-
-import com.autodesk.icp.community.web.CommonTextHandler;
-import com.autodesk.icp.community.web.HandshakeInterceptor;
+import org.springframework.messaging.simp.config.MessageBrokerRegistry;
+import org.springframework.web.socket.config.annotation.AbstractWebSocketMessageBrokerConfigurer;
+import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
+import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 
 /**
  * The configurer of the Web Socket endpoints.
@@ -47,30 +34,20 @@ import com.autodesk.icp.community.web.HandshakeInterceptor;
  * @author Oliver Wu
  */
 @Configuration
-@EnableWebSocket
-public class WebSocketConfig implements WebSocketConfigurer {
-    private static final Logger LOGGER = LoggerFactory.getLogger(WebSocketConfig.class);
-
+@EnableWebSocketMessageBroker
+public class WebSocketConfig extends AbstractWebSocketMessageBrokerConfigurer  {
+    
     @Override
-    public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
-        LOGGER.info("Registering CommonTextHandler...");
-        registry.addHandler(createCommonTextHandler(), "/text")
-                .addInterceptors(new HandshakeInterceptor())
-                .setAllowedOrigins("*");
+    public void configureMessageBroker(MessageBrokerRegistry config) {
+        config.setApplicationDestinationPrefixes("/app");
+        config.enableSimpleBroker("/queue", "/topic");
+//        config.setPathMatcher(new AntPathMatcher("."));
+    }
+    
+    @Override
+    public void registerStompEndpoints(StompEndpointRegistry registry) {
+        registry.addEndpoint("/portfolio").withSockJS();
     }
 
-    @Bean
-    public ServletServerContainerFactoryBean createWebSocketContainer() {
-        ServletServerContainerFactoryBean container = new ServletServerContainerFactoryBean();
-        container.setMaxTextMessageBufferSize(8192);
-        container.setMaxBinaryMessageBufferSize(8192);
-        container.setMaxSessionIdleTimeout(30 * 60 * 1000); // 30 minutes
-        container.setAsyncSendTimeout(10 * 60 * 1000);
-        return container;
-    }
-
-    @Bean
-    public WebSocketHandler createCommonTextHandler() {
-        return new CommonTextHandler();
-    }
+   
 }
