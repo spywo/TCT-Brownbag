@@ -22,6 +22,8 @@
 //
 package com.autodesk.icp.community.exception;
 
+import com.autodesk.icp.community.common.exception.BusinessException;
+
 /**
  * This is the customized exception representing the unauthorized operations.
  * 
