@@ -20,22 +20,37 @@
 // Software Restricted Rights) and DFAR 252.227-7013(c)(1)(ii)
 // (Rights in Technical Data and Computer Software), as applicable.
 //
-package com.autodesk.icp.community.config;
-
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.FilterType;
-import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
+package com.autodesk.icp.community.common.exception;
 
 /**
- * Application level configurations.
+ * It is for internal errors (ie system problems not the user's fault).
  * 
- * @author Oliver Wu
+ * @author Oliver
  */
-@Configuration
-@ComponentScan(basePackages = "com.autodesk.icp.community", excludeFilters = { @ComponentScan.Filter(value = Service.class, type = FilterType.ANNOTATION),
-                                                                    @ComponentScan.Filter(value = Component.class, type = FilterType.ANNOTATION) })
-public class AppConfig {
+public class SystemException extends BaseException {
+    private static final long serialVersionUID = -4385778692022807712L;
 
+    public static final String DEFAULT_ERROR_CODE = "error.system";
+
+    public static final String DEFAULT_ERROR_MESSAGE = "System is not available, please try again later.";
+
+    public SystemException() {
+        super(DEFAULT_ERROR_CODE, DEFAULT_ERROR_MESSAGE);
+    }
+
+    public SystemException(String pErrorCode) {
+        super(pErrorCode, DEFAULT_ERROR_MESSAGE);
+    }
+
+    public SystemException(Throwable pNext) {
+        super(DEFAULT_ERROR_CODE, pNext, DEFAULT_ERROR_MESSAGE);
+    }
+
+    public SystemException(String pErrorCode, String pErrorMessage) {
+        super(pErrorCode, pErrorMessage);
+    }
+
+    public SystemException(String pErrorCode, Throwable pNext, String pErrorMessage) {
+        super(pErrorCode, pNext, pErrorMessage);
+    }
 }

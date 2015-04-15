@@ -20,22 +20,15 @@
 // Software Restricted Rights) and DFAR 252.227-7013(c)(1)(ii)
 // (Rights in Technical Data and Computer Software), as applicable.
 //
-package com.autodesk.icp.community.config;
-
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.FilterType;
-import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
+package com.autodesk.icp.community.common.util;
 
 /**
- * Application level configurations.
- * 
  * @author Oliver Wu
  */
-@Configuration
-@ComponentScan(basePackages = "com.autodesk.icp.community", excludeFilters = { @ComponentScan.Filter(value = Service.class, type = FilterType.ANNOTATION),
-                                                                    @ComponentScan.Filter(value = Component.class, type = FilterType.ANNOTATION) })
-public class AppConfig {
-
+public class Consts {
+    public final static String MESSAGE_STATUS_OK = "OK";
+    public final static String MESSAGE_STATUS_FAILURE = "Error";
+    
+    public final static String SESSION_ATTR_SESSION = "CURRENT_HTTP_SESSION";
+    public final static String SESSION_ATTR_USER = "HTTP_SESSION_USER";
 }

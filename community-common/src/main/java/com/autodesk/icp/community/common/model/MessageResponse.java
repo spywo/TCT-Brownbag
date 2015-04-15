@@ -20,23 +20,60 @@
 // Software Restricted Rights) and DFAR 252.227-7013(c)(1)(ii)
 // (Rights in Technical Data and Computer Software), as applicable.
 //
-package com.autodesk.icp.community.web;
+package com.autodesk.icp.community.common.model;
 
-import org.springframework.web.socket.TextMessage;
-import org.springframework.web.socket.WebSocketSession;
-import org.springframework.web.socket.handler.TextWebSocketHandler;
 
 /**
- * The common text handler.
- * 
  * @author Oliver Wu
  */
-public class CommonTextHandler extends TextWebSocketHandler {
+public class MessageResponse {
+    private String status;
+    private String exception;
+    private Object payload;
 
-    @Override
-    protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
-        super.handleTextMessage(session, message);
-        TextMessage returnMessage = new TextMessage(message.getPayload() + " received at server");
-        session.sendMessage(returnMessage);
+    /**
+     * @return the status
+     */
+    public String getStatus() {
+        return status;
     }
+
+    /**
+     * @param status
+     *            the status to set
+     */
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    /**
+     * @return the payload
+     */
+    public Object getPayload() {
+        return payload;
+    }
+
+    /**
+     * @param payload
+     *            the payload to set
+     */
+    public void setPayload(Object payload) {
+        this.payload = payload;
+    }
+
+    /**
+     * @return the exception
+     */
+    public String getException() {
+        return exception;
+    }
+
+    /**
+     * @param exception
+     *            the exception to set
+     */
+    public void setException(String exception) {
+        this.exception = exception;
+    }
+
 }

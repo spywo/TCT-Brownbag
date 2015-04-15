@@ -20,22 +20,38 @@
 // Software Restricted Rights) and DFAR 252.227-7013(c)(1)(ii)
 // (Rights in Technical Data and Computer Software), as applicable.
 //
-package com.autodesk.icp.community.config;
-
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.FilterType;
-import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
+package com.autodesk.icp.community.common.exception;
 
 /**
- * Application level configurations.
+ * It is for user-related errors (ie errors triggered by invalid data submitted by the user and thus correctable by the
+ * user).
  * 
- * @author Oliver Wu
+ * @author Oliver
  */
-@Configuration
-@ComponentScan(basePackages = "com.autodesk.icp.community", excludeFilters = { @ComponentScan.Filter(value = Service.class, type = FilterType.ANNOTATION),
-                                                                    @ComponentScan.Filter(value = Component.class, type = FilterType.ANNOTATION) })
-public class AppConfig {
+public class BusinessException extends BaseException {
+    private static final long serialVersionUID = -4385778692022807712L;
 
+    public static final String DEFAULT_ERROR_CODE = "error.business";
+
+    public static final String DEFAULT_ERROR_MESSAGE = "Invalid operation.";
+
+    public BusinessException() {
+        super(DEFAULT_ERROR_CODE, DEFAULT_ERROR_MESSAGE);
+    }
+
+    public BusinessException(String pErrorCode) {
+        super(pErrorCode, DEFAULT_ERROR_MESSAGE);
+    }
+
+    public BusinessException(Throwable pNext) {
+        super(DEFAULT_ERROR_CODE, pNext, DEFAULT_ERROR_MESSAGE);
+    }
+
+    public BusinessException(String pErrorCode, String pErrorMessage) {
+        super(pErrorCode, pErrorMessage);
+    }
+
+    public BusinessException(String pErrorCode, Throwable pNext, String pErrorMessage) {
+        super(pErrorCode, pNext, pErrorMessage);
+    }
 }

@@ -20,22 +20,40 @@
 // Software Restricted Rights) and DFAR 252.227-7013(c)(1)(ii)
 // (Rights in Technical Data and Computer Software), as applicable.
 //
-package com.autodesk.icp.community.config;
+package com.autodesk.icp.community.intecepter;
 
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.FilterType;
-import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
+import org.springframework.messaging.Message;
+import org.springframework.messaging.MessageChannel;
+import org.springframework.messaging.support.ChannelInterceptorAdapter;
 
 /**
- * Application level configurations.
- * 
  * @author Oliver Wu
+ *
  */
-@Configuration
-@ComponentScan(basePackages = "com.autodesk.icp.community", excludeFilters = { @ComponentScan.Filter(value = Service.class, type = FilterType.ANNOTATION),
-                                                                    @ComponentScan.Filter(value = Component.class, type = FilterType.ANNOTATION) })
-public class AppConfig {
+public class AuthenticationChannelInterceptor extends ChannelInterceptorAdapter {
+    @Override
+    public Message<?> preSend(Message<?> message, MessageChannel channel) {
+        return message;
+    }
 
+    @Override
+    public void postSend(Message<?> message, MessageChannel channel, boolean sent) {
+    }
+
+    @Override
+    public void afterSendCompletion(Message<?> message, MessageChannel channel, boolean sent, Exception ex) {
+    }
+
+    public boolean preReceive(MessageChannel channel) {
+        return true;
+    }
+
+    @Override
+    public Message<?> postReceive(Message<?> message, MessageChannel channel) {
+        return message;
+    }
+
+    @Override
+    public void afterReceiveCompletion(Message<?> message, MessageChannel channel, Exception ex) {
+    }
 }
