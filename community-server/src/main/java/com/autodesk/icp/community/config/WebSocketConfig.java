@@ -23,10 +23,14 @@
 package com.autodesk.icp.community.config;
 
 import org.springframework.context.annotation.Configuration;
+import org.springframework.messaging.simp.config.ChannelRegistration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.web.socket.config.annotation.AbstractWebSocketMessageBrokerConfigurer;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
+
+import com.autodesk.icp.community.intecepter.AuthenticationChannelInterceptor;
+import com.autodesk.icp.community.intecepter.SessionHoldHandshakeInterceptor;
 
 /**
  * The configurer of the Web Socket endpoints.
@@ -35,19 +39,23 @@ import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
  */
 @Configuration
 @EnableWebSocketMessageBroker
-public class WebSocketConfig extends AbstractWebSocketMessageBrokerConfigurer  {
-    
+public class WebSocketConfig extends AbstractWebSocketMessageBrokerConfigurer {
+
     @Override
-    public void configureMessageBroker(MessageBrokerRegistry config) {
-        config.setApplicationDestinationPrefixes("/app");
-        config.enableSimpleBroker("/queue", "/topic");
-//        config.setPathMatcher(new AntPathMatcher("."));
-    }
-    
-    @Override
-    public void registerStompEndpoints(StompEndpointRegistry registry) {
-        registry.addEndpoint("/portfolio").withSockJS();
+    public void configureMessageBroker(MessageBrokerRegistry registry) {
+        registry.setApplicationDestinationPrefixes("/app");
+        registry.enableSimpleBroker("/queue", "/topic");
+        registry.setUserDestinationPrefix("/user");
+        // config.setPathMatcher(new AntPathMatcher("."));
     }
 
-   
+    @Override
+    public void registerStompEndpoints(StompEndpointRegistry registry) {
+        registry.addEndpoint("/portfolio").withSockJS().setInterceptors(new SessionHoldHandshakeInterceptor());
+    }
+
+    @Override
+    public void configureClientInboundChannel(ChannelRegistration registration) {
+        registration.setInterceptors(new AuthenticationChannelInterceptor());
+    }
 }

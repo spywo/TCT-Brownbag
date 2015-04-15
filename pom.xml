@@ -8,7 +8,6 @@
 
 	<!-- Project Modules -->
 	<modules>
-		<module>community-client</module>
 		<module>community-server</module>
 		<module>community-common</module>
 		<module>community-mobile-android</module>

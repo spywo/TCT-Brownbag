@@ -46,11 +46,6 @@
 			<artifactId>community-common</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		<dependency>
-			<groupId>com.autodesk.icp</groupId>
-			<artifactId>community-client</artifactId>
-			<version>${project.version}</version>
-		</dependency>
 
 		<dependency>
 			<groupId>org.slf4j</groupId>

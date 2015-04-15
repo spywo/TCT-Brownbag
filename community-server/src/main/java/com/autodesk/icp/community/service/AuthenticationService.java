@@ -39,6 +39,11 @@ import com.unboundid.ldap.sdk.SearchScope;
 import com.unboundid.ldap.sdk.SimpleBindRequest;
 import com.unboundid.ldap.sdk.controls.SubentriesRequestControl;
 
+/**
+ * The LDAP authentication service.
+ * 
+ * @author Oliver Wu
+ */
 @Service
 public class AuthenticationService {
     private static final Logger LOGGER = LoggerFactory.getLogger(AuthenticationService.class);
@@ -78,7 +83,7 @@ public class AuthenticationService {
     private User queryLdap(LDAPConnection connection, String username) throws LDAPException {
         User user = null;
 
-        String accountName = username.toLowerCase().replaceFirst("ads\\", "");
+        String accountName = username.toLowerCase().replace("ads\\", "");
         String baseDN = "DC=ads,DC=autodesk,DC=com";
         String filter = "&(objectClass=user)(sAMAccountName=" + accountName + ")";
 
@@ -95,9 +100,10 @@ public class AuthenticationService {
 
             user = new User();
             user.setName(entry.getAttribute("name").getValue());
-            user.setEmail(entry.getAttribute("email").getValue());
+            user.setEmail(entry.getAttribute("mail").getValue());
             user.setDisplayName(entry.getAttribute("displayName").getValue());
             user.setLoginId(username);
+            user.setAuthed(true);
         }
 
         return user;

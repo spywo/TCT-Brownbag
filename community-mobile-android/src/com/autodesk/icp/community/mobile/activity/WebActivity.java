@@ -23,7 +23,7 @@ public class WebActivity extends Activity {
 
         webView = (WebView)findViewById(R.id.mainWebView);
 
-        webView.loadUrl("http://10.148.252.16:8080");
+        webView.loadUrl("http://10.148.202.55:8080/community/home");
 
         // myWebView.loadUrl("file:///android_asset/www/test2.html");
 

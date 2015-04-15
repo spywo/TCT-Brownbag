@@ -38,7 +38,7 @@ public class MainActivity extends Activity {
     }
 
     private void renderLoginActivityInBackgroud() {
-        Intent intent = new Intent(this, LoginActivity.class);
+        Intent intent = new Intent(this, WebActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
         startActivity(intent);
     }

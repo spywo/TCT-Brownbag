@@ -22,10 +22,16 @@
 //
 package com.autodesk.icp.community.config;
 
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
+import org.springframework.web.servlet.view.InternalResourceViewResolver;
+import org.springframework.web.servlet.view.JstlView;
 
 /**
  * Dispatch Servlet scope configurations.
@@ -33,7 +39,24 @@ import org.springframework.stereotype.Controller;
  * @author Oliver Wu
  */
 @Configuration
-@ComponentScan(basePackages = "com.autodesk.icp", includeFilters = { @ComponentScan.Filter(value = Controller.class, type = FilterType.ANNOTATION)})
-public class MVCConfig {
-   
+@EnableWebMvc
+@ComponentScan(basePackages = "com.autodesk.icp.community", includeFilters = { @ComponentScan.Filter(value = Controller.class, type = FilterType.ANNOTATION) })
+public class MVCConfig extends WebMvcConfigurerAdapter {
+    
+    @Bean
+    public InternalResourceViewResolver getViewResolver() {
+        InternalResourceViewResolver resolver = new InternalResourceViewResolver();
+        resolver.setPrefix("/WEB-INF/view/");
+        resolver.setSuffix(".jsp");
+        resolver.setContentType("text/html; charset=UTF-8");        
+        resolver.setViewClass(JstlView.class);
+        return resolver;
+    }
+     
+    @Override
+    public void addResourceHandlers(final ResourceHandlerRegistry registry) {
+        registry.addResourceHandler("/css/**").addResourceLocations("/WEB-INF/css/");
+        registry.addResourceHandler("/js/**").addResourceLocations("/WEB-INF/js/");
+        registry.addResourceHandler("/fonts/**").addResourceLocations("/WEB-INF/fonts/");
+    }
 }
