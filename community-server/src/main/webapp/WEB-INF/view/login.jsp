@@ -1,11 +1,11 @@
 <div id="loginPage" class="page-section hide">
-	<div class="container">
+	<div class="container-fluid">
 		<form class="form-horizontal">
 			<div class="form-group">
 				<label for="username" class="col-sm-2 control-label">Username</label>
 				<div class="col-sm-10">
 					<input type="text" class="form-control" id="username"
-						placeholder="Starts with ads\">
+						placeholder="ads\">
 				</div>
 			</div>
 			<div class="form-group">
@@ -18,8 +18,7 @@
 			<div class="form-group">
 				<div class="col-sm-offset-2 col-sm-10">
 					<div class="checkbox">
-						<label> <input type="checkbox"> Remember me
-						</label>
+						<label><input type="checkbox">Remember me</label>
 					</div>
 				</div>
 			</div>

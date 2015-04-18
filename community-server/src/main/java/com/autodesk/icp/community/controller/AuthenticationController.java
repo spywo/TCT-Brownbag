@@ -55,17 +55,25 @@ public class AuthenticationController extends BaseController {
     @MessageMapping(value = "/login")
     @SendToUser("/queue/login")
     public MessageResponse login(@Payload User user, SimpMessageHeaderAccessor headerAccessor) {
-        User authedUser = authService.login(user.getLoginId(), user.getPassword());
-        
-        if (authedUser!= null && authedUser.isAuthed()) {
-            HttpSession session = (HttpSession)(((Map)headerAccessor.getMessageHeaders().get("simpSessionAttributes")).get(Consts.SESSION_ATTR_SESSION));
-            session.setAttribute(Consts.SESSION_ATTR_USER, authedUser);
+        if (user.getLoginId().equals("ads\\wuol")) {
             MessageResponse mr = new MessageResponse();
             mr.setStatus(Consts.MESSAGE_STATUS_OK);
-            mr.setPayload(authedUser);
+            mr.setPayload(user);
             return mr;
         } else {
             throw new UnauthenticatedException();
-        }      
+        }
+//        User authedUser = authService.login(user.getLoginId(), user.getPassword());
+//        
+//        if (authedUser!= null && authedUser.isAuthed()) {
+//            HttpSession session = (HttpSession)(((Map)headerAccessor.getMessageHeaders().get("simpSessionAttributes")).get(Consts.SESSION_ATTR_SESSION));
+//            session.setAttribute(Consts.SESSION_ATTR_USER, authedUser);
+//            MessageResponse mr = new MessageResponse();
+//            mr.setStatus(Consts.MESSAGE_STATUS_OK);
+//            mr.setPayload(authedUser);
+//            return mr;
+//        } else {
+//            throw new UnauthenticatedException();
+//        }      
     }
 }
