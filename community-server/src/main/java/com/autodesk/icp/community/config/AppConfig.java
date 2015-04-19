@@ -24,6 +24,7 @@ package com.autodesk.icp.community.config;
 
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
@@ -34,8 +35,9 @@ import org.springframework.stereotype.Service;
  * @author Oliver Wu
  */
 @Configuration
-@ComponentScan(basePackages = "com.autodesk.icp.community", excludeFilters = { @ComponentScan.Filter(value = Service.class, type = FilterType.ANNOTATION),
-                                                                    @ComponentScan.Filter(value = Component.class, type = FilterType.ANNOTATION) })
+@ComponentScan(basePackages = "com.autodesk.icp.community", includeFilters = { @ComponentScan.Filter(value = Service.class, type = FilterType.ANNOTATION),
+                                                                              @ComponentScan.Filter(value = Component.class, type = FilterType.ANNOTATION) })
+@EnableAspectJAutoProxy
 public class AppConfig {
 
 }

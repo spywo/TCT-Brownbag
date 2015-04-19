@@ -30,6 +30,7 @@ import com.autodesk.icp.community.common.exception.BaseException;
 import com.autodesk.icp.community.common.exception.SystemException;
 import com.autodesk.icp.community.common.model.MessageResponse;
 import com.autodesk.icp.community.common.util.Consts;
+import com.autodesk.icp.community.exception.UnauthenticatedException;
 
 /**
  * @author Oliver Wu
@@ -48,13 +49,20 @@ public class BaseController {
         MessageResponse mr = new MessageResponse();
         mr.setStatus(Consts.MESSAGE_STATUS_FAILURE);
         if (exception instanceof BaseException) {
-            mr.setException(exception.toString());
+            mr.setException(exception.getMessage());
         } else {
-            SystemException se = new SystemException(SystemException.DEFAULT_ERROR_CODE, exception, exception.getMessage());
-            mr.setException(se.toString());
+            SystemException se = new SystemException(SystemException.DEFAULT_ERROR_CODE,
+                                                     exception,
+                                                     exception.getMessage());
+            mr.setException(se.getMessage());
         }
 
         return mr;
     }
 
+    @MessageExceptionHandler(value = UnauthenticatedException.class)
+    @SendToUser(value = "/queue/authError", broadcast = false)
+    public MessageResponse handleUnauthenticationException(Exception exception) {
+        return handleException(exception);
+    }
 }

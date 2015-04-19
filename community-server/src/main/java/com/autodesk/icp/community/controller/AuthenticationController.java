@@ -27,6 +27,7 @@ import java.util.Map;
 import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.Message;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
@@ -36,9 +37,11 @@ import org.springframework.stereotype.Controller;
 
 import com.autodesk.icp.community.common.model.MessageResponse;
 import com.autodesk.icp.community.common.model.User;
+import com.autodesk.icp.community.common.model.UserPrinciple;
 import com.autodesk.icp.community.common.util.Consts;
 import com.autodesk.icp.community.exception.UnauthenticatedException;
 import com.autodesk.icp.community.service.AuthenticationService;
+import com.autodesk.icp.community.util.WSUtils;
 
 /**
  * @author Oliver Wu
@@ -54,11 +57,14 @@ public class AuthenticationController extends BaseController {
 
     @MessageMapping(value = "/login")
     @SendToUser("/queue/login")
-    public MessageResponse login(@Payload User user, SimpMessageHeaderAccessor headerAccessor) {
-        if (user.getLoginId().equals("ads\\wuol")) {
+    public MessageResponse login(Message<?> message, @Payload User user) {
+        if (user.getLoginId().equals("ads\\wuol")) {            
+            
             MessageResponse mr = new MessageResponse();
             mr.setStatus(Consts.MESSAGE_STATUS_OK);
             mr.setPayload(user);
+            
+            WSUtils.saveUser(message, user);
             return mr;
         } else {
             throw new UnauthenticatedException();

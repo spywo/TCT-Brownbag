@@ -20,41 +20,28 @@
 // Software Restricted Rights) and DFAR 252.227-7013(c)(1)(ii)
 // (Rights in Technical Data and Computer Software), as applicable.
 //
-package com.autodesk.icp.community.intecepter;
+package com.autodesk.icp.community.common.model;
 
-import org.springframework.messaging.Message;
-import org.springframework.messaging.MessageChannel;
-import org.springframework.messaging.support.ChannelInterceptorAdapter;
+import java.security.Principal;
 
 /**
  * @author Oliver Wu
- *
  */
-public class AuthenticationChannelInterceptor extends ChannelInterceptorAdapter {
-    
-    @Override
-    public Message<?> preSend(Message<?> message, MessageChannel channel) {          
-        return message;
+public class UserPrinciple implements Principal {
+
+    private User user;
+
+    public UserPrinciple(User user) {
+        this.user = user;
     }
 
+    /*
+     * (non-Javadoc)
+     * @see java.security.Principal#getName()
+     */
     @Override
-    public void postSend(Message<?> message, MessageChannel channel, boolean sent) {        
+    public String getName() {
+        return user.getName();
     }
 
-    @Override
-    public void afterSendCompletion(Message<?> message, MessageChannel channel, boolean sent, Exception ex) {
-    }
-
-    public boolean preReceive(MessageChannel channel) {
-        return true;
-    }
-
-    @Override
-    public Message<?> postReceive(Message<?> message, MessageChannel channel) {
-        return message;
-    }
-
-    @Override
-    public void afterReceiveCompletion(Message<?> message, MessageChannel channel, Exception ex) {
-    }
 }

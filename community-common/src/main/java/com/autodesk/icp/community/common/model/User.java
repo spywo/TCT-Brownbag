@@ -22,6 +22,9 @@
 //
 package com.autodesk.icp.community.common.model;
 
+import java.security.Principal;
+
+
 /**
  * @author Oliver Wu
  */

@@ -22,39 +22,39 @@
 //
 package com.autodesk.icp.community.intecepter;
 
+import org.aspectj.lang.JoinPoint;
+import org.aspectj.lang.annotation.Aspect;
+import org.aspectj.lang.annotation.Before;
 import org.springframework.messaging.Message;
-import org.springframework.messaging.MessageChannel;
-import org.springframework.messaging.support.ChannelInterceptorAdapter;
+import org.springframework.stereotype.Component;
+
+import com.autodesk.icp.community.common.model.User;
+import com.autodesk.icp.community.exception.UnauthenticatedException;
+import com.autodesk.icp.community.util.WSUtils;
 
 /**
+ * The interceptor for handling messages.
+ * 
  * @author Oliver Wu
- *
  */
-public class AuthenticationChannelInterceptor extends ChannelInterceptorAdapter {
-    
-    @Override
-    public Message<?> preSend(Message<?> message, MessageChannel channel) {          
-        return message;
-    }
+@Aspect
+@Component
+public class AuthenticationMessageInterceptor {
+    @Before(value = "@annotation(org.springframework.messaging.handler.annotation.MessageMapping)")
+    public void verifyAuthentication(JoinPoint joinPoint) {
+        String methodName = joinPoint.getSignature().getName();
+        if (!"login".equalsIgnoreCase(methodName)) {
+            Object[] args = joinPoint.getArgs();
+            if (args != null && args.length > 0) {
+                if (args[0] instanceof Message<?>) {
+                    Message<?> message = (Message<?>)args[0];
 
-    @Override
-    public void postSend(Message<?> message, MessageChannel channel, boolean sent) {        
-    }
-
-    @Override
-    public void afterSendCompletion(Message<?> message, MessageChannel channel, boolean sent, Exception ex) {
-    }
-
-    public boolean preReceive(MessageChannel channel) {
-        return true;
-    }
-
-    @Override
-    public Message<?> postReceive(Message<?> message, MessageChannel channel) {
-        return message;
-    }
-
-    @Override
-    public void afterReceiveCompletion(Message<?> message, MessageChannel channel, Exception ex) {
+                    User user = WSUtils.getUser(message);
+                    if (user == null || !user.isAuthed()) {
+                        throw new UnauthenticatedException();
+                    }
+                }
+            }
+        }
     }
 }

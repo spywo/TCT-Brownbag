@@ -11,8 +11,16 @@
             var response = JSON.parse(calResult.body);
             UserManager.setUser(response.payload);
 
-            UIManager.activePage($("#homePage"));
+            UIManager.activePage($("#loginPage"));
             UIManager.hideLoading();
+        },
+        
+        authErrorHandler : function(calResult) {
+            UIManager.activePage($("#loginPage"));
+            UIManager.hideLoading();
+            
+            $("#password").val("");
+            $("#password").focus();
         }
     }
 })();
@@ -20,18 +28,29 @@
 (function() {
     var MessageClientParent = function() {
         var stompClient = null;
-        
+
         var isInitSubscriptionDone = false;
 
+        var funcInvokingMap = {};
+
         var connect = function() {
+            // reset the subscription flag in case the connection needs to be
+            // regenerated
             isInitSubscriptionDone = false;
-            
+
             var socket = new SockJS('/community/portfolio');
             stompClient = Stomp.over(socket);
 
+            // once the browser has been closed, the disconnected frame will be
+            // automatically sent
             stompClient.connect({}, function(frame) {
                 initSubscription();
             }, function(error) {
+                // all the STOMP web socket error will be handled here
+
+                clearFuncWaitingInvocation();
+
+                UIManager.hideLoading();
                 UIManager.showWarning(error);
             });
         }
@@ -40,41 +59,49 @@
 
             stompClient.subscribe('/user/queue/login', MsgSubscribeManager.loginSuccessHandler);
             stompClient.subscribe('/user/queue/errors', MsgSubscribeManager.errorHandler);
-            
+            stompClient.subscribe('/user/queue/authError', MsgSubscribeManager.authErrorHandler);
+
             isInitSubscriptionDone = true;
         }
 
-                
-        this.isConnected = function() {
+        var isConnected = function() {
             if (typeof stompClient != "undefined" && stompClient != null && stompClient.connected) {
                 return true;
             } else {
                 return false;
-            }            
+            }
         }
-        
-        var invokeLater = function(client, func, paramArray) {
-            if (!client.isConnected() || !isAllSubscribed) {
-               // setTimeout(invokeLater, 100,  client, func, params);
-                setTimeout(function() { invokeLater.apply(null, [client, func, paramArray]) }, 100);
+
+        // invoke the function once STOMP connection has been generated and all
+        // subscriptions have been done
+        var invokeLater = function(func, paramArray) {
+            if (!isConnected() || !isInitSubscriptionDone) {
+                // setTimeout(invokeLater, 100, client, func, params);
+                var to = setTimeout(function() {
+                    invokeLater.apply(null, [ func, paramArray ])
+                }, 100);
+                funcInvokingMap[func] = to;
             } else {
                 func.apply(stompClient, paramArray);
             }
-        } 
+        }
+
+        var clearFuncWaitingInvocation = function() {
+            for ( var obj in funcInvokingMap) {
+                clearTimeout(funcInvokingMap[obj]);
+            }
+
+            funcInvokingMap = {};
+        }
 
         this.send = function(destination, header, playload) {
-            try {
-                if (this.isConnected()) {
-                    stompClient.send(destination, header, playload);
-                } else {
-                    // recover the connection
-                    connect();
-                    
-                    invokeLater(this, stompClient.send, [destination, header, playload]);
-                }
-            } catch (err) {
-                UIManager.hideLoading();
-                UIManager.showWarning(err.toString());
+            if (isConnected()) {
+                stompClient.send(destination, header, playload);
+            } else {
+                // recover the connection
+                connect();
+
+                invokeLater(stompClient.send, [ destination, header, playload ]);
             }
         }
     };
@@ -99,11 +126,11 @@
             return window.current_user;
 
         },
-        
+
         setUser : function(user) {
             window.current_user = user;
         },
-        
+
         isLoggedIn : function() {
             if (typeof window.current_user == 'undefined') {
                 return false;
@@ -165,8 +192,7 @@
 })(jQuery);
 
 $(function() {
-    var client = MessageClient.getInstance();
-
+    // for mobile app there is only one window
     if (!UserManager.isLoggedIn()) {
         UIManager.activePage($("#loginPage"));
     }
