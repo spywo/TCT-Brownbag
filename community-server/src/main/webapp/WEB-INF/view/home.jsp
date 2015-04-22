@@ -1,6 +1,17 @@
 <div id="homePage" class="page-section hide">
-	<div class="container">
-		<b>Coming soon...</b>
-	</div>
+	<nav class="navbar navbar-default navbar-fixed-top">
+		
+	</nav>
+
+
+	<nav class="navbar navbar-default navbar-fixed-bottom" role="navigation">
+		<div class="nav navbar-invers row">
+			<div role="presentation" class="active col-xs-4 col-sm-4"><span class="glyphicon glyphicon-home"></span> Home</div>
+			<div role="presentation" class="col-xs-4 col-sm-4"><span class="glyphicon glyphicon-user"></span> Profile</div>
+			<div role="presentation" class="col-xs-4 col-sm-4"><span class="glyphicon glyphicon-envelope"></span> Messages</div>
+		</div>
+	</nav>
+
+
 </div>
 

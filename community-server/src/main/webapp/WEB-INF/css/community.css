@@ -13,3 +13,19 @@
     from { transform: scale(1) rotate(0deg);}
     to { transform: scale(1) rotate(360deg);}
 }
+
+
+.navbar .nav { 
+    width: 100%;
+    text-align: center;    
+}
+
+.navbar .nav > div {
+    display: inline-block;
+    line-height: 50px;	
+}
+
+.navbar .nav .active {
+   color: green;
+}
+

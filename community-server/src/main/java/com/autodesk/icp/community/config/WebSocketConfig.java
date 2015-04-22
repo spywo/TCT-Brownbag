@@ -44,8 +44,9 @@ public class WebSocketConfig extends AbstractWebSocketMessageBrokerConfigurer {
     @Override
     public void configureMessageBroker(MessageBrokerRegistry registry) {
         registry.setApplicationDestinationPrefixes("/app");
-        registry.enableSimpleBroker("/queue", "/topic");
+        registry.enableStompBrokerRelay("/queue", "/topic").setRelayHost("localhost").setRelayPort(61613);
         registry.setUserDestinationPrefix("/user");
+        
         // config.setPathMatcher(new AntPathMatcher("."));
     }
 

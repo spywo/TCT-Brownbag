@@ -11,7 +11,7 @@
             var response = JSON.parse(calResult.body);
             UserManager.setUser(response.payload);
 
-            UIManager.activePage($("#loginPage"));
+            UIManager.activePage($("#homePage"));
             UIManager.hideLoading();
         },
         
