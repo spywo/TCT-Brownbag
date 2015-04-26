@@ -30,6 +30,8 @@ import javax.servlet.http.HttpSession;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
 import org.springframework.http.server.ServletServerHttpRequest;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.socket.WebSocketHandler;
 import org.springframework.web.socket.server.support.HttpSessionHandshakeInterceptor;
 
@@ -50,6 +52,10 @@ public class AuthticationVerificationHandshakeInterceptor extends HttpSessionHan
                                    ServerHttpResponse response,
                                    WebSocketHandler wsHandler,
                                    Map<String, Object> attributes) throws Exception {
+        SecurityContext sc = (SecurityContext)getSession(request).getAttribute("SPRING_SECURITY_CONTEXT");
+        SecurityContextHolder.setContext(sc);
+        Object obj = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        System.out.println("Principal: "+obj);
         return super.beforeHandshake(request, response, wsHandler, attributes);
     }
 

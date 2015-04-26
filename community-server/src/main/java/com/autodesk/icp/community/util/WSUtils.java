@@ -22,6 +22,7 @@
 //
 package com.autodesk.icp.community.util;
 
+import java.util.Collection;
 import java.util.Map;
 
 import javax.servlet.http.HttpSession;
@@ -29,6 +30,9 @@ import javax.servlet.http.HttpSession;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.SimpMessageType;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import com.autodesk.icp.community.common.model.User;
 import com.autodesk.icp.community.common.util.Consts;
@@ -58,8 +62,58 @@ public class WSUtils {
         return user;
     }
 
-    public static void saveUser(Message<?> message, User user) {
+    public static void saveUser(Message<?> message, final User user) {
         getHttpSession(message).setAttribute(Consts.SESSION_ATTR_USER, user);
+        
+        SecurityContextHolder.getContext().setAuthentication(new Authentication() {
+            
+            @Override
+            public String getName() {
+                // TODO Auto-generated method stub
+                return user.getDisplayName();
+            }
+            
+            @Override
+            public void setAuthenticated(boolean isAuthenticated) throws IllegalArgumentException {
+                // TODO Auto-generated method stub
+                
+            }
+            
+            @Override
+            public boolean isAuthenticated() {
+                // TODO Auto-generated method stub
+                return false;
+            }
+            
+            @Override
+            public Object getPrincipal() {
+                // TODO Auto-generated method stub
+                return user;
+            }
+            
+            @Override
+            public Object getDetails() {
+                // TODO Auto-generated method stub
+                return null;
+            }
+            
+            @Override
+            public Object getCredentials() {
+                // TODO Auto-generated method stub
+                return null;
+            }
+            
+            @Override
+            public Collection<? extends GrantedAuthority> getAuthorities() {
+                // TODO Auto-generated method stub
+                return null;
+            }
+        });
+        
+
+        // Create a new session and add the security context.
+        
+        getHttpSession(message).setAttribute("SPRING_SECURITY_CONTEXT", SecurityContextHolder.getContext());
     }
 
     public static boolean isLoginRequest(Message<?> message) {

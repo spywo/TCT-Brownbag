@@ -13,6 +13,8 @@
 
             UIManager.activePage($("#homePage"));
             UIManager.hideLoading();
+            
+            MessageClient.getInstance().init();
         },
 
         authErrorHandler : function(calResult) {
@@ -22,7 +24,13 @@
 
             $("#password").val("");
             $("#password").focus();
-        }
+        },
+        
+        notificationHandler : function(calResult) {            
+            UIManager.hideLoading();
+            UIManager.showWarning("you have message.");
+        },
+        
     }
 })();
 
@@ -98,7 +106,7 @@
 
         var initSubscription = function() {
 
-//            stompClient.subscribe('/user/quthQueue/login', MsgSubscribeManager.loginSuccessHandler);             
+            stompClient.subscribe('/topic/notification', MsgSubscribeManager.notificationHandler);             
 
             isInitSubscriptionDone = true;
         }
@@ -141,6 +149,12 @@
                 connect();
 
                 invokeLater(stompClient.send, [ destination, header, playload ]);
+            }
+        }
+        
+        this.init = function() {
+            if (!isConnected()) {
+                connect();
             }
         }
     };
