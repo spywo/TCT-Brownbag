@@ -22,22 +22,23 @@
 //
 package com.autodesk.icp.community.controller;
 
-import java.util.Map;
-
-import javax.servlet.http.HttpSession;
+import java.security.Security;
+import java.util.Collection;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.Message;
+import org.springframework.messaging.handler.annotation.MessageExceptionHandler;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
-import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.messaging.simp.annotation.SendToUser;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 
 import com.autodesk.icp.community.common.model.MessageResponse;
 import com.autodesk.icp.community.common.model.User;
-import com.autodesk.icp.community.common.model.UserPrinciple;
 import com.autodesk.icp.community.common.util.Consts;
 import com.autodesk.icp.community.exception.UnauthenticatedException;
 import com.autodesk.icp.community.service.AuthenticationService;
@@ -57,7 +58,7 @@ public class AuthenticationController extends BaseController {
 
     @MessageMapping(value = "/login")
     @SendToUser("/queue/login")
-    public MessageResponse login(Message<?> message, @Payload User user) {
+    public MessageResponse login(Message<?> message, @Payload final User user) {
         if (user.getLoginId().equals("ads\\wuol")) {            
             
             MessageResponse mr = new MessageResponse();
@@ -65,6 +66,52 @@ public class AuthenticationController extends BaseController {
             mr.setPayload(user);
             
             WSUtils.saveUser(message, user);
+            
+            SecurityContextHolder.getContext().setAuthentication(new Authentication() {
+                
+                @Override
+                public String getName() {
+                    // TODO Auto-generated method stub
+                    return user.getDisplayName();
+                }
+                
+                @Override
+                public void setAuthenticated(boolean isAuthenticated) throws IllegalArgumentException {
+
+                    
+                }
+                
+                @Override
+                public boolean isAuthenticated() {
+                    // TODO Auto-generated method stub
+                    return true;
+                }
+                
+                @Override
+                public Object getPrincipal() {
+
+                    return user;
+                }
+                
+                @Override
+                public Object getDetails() {
+                    // TODO Auto-generated method stub
+                    return null;
+                }
+                
+                @Override
+                public Object getCredentials() {
+                    // TODO Auto-generated method stub
+                    return null;
+                }
+                
+                @Override
+                public Collection<? extends GrantedAuthority> getAuthorities() {
+                    // TODO Auto-generated method stub
+                    return null;
+                }
+            });
+            
             return mr;
         } else {
             throw new UnauthenticatedException();
@@ -81,5 +128,12 @@ public class AuthenticationController extends BaseController {
 //        } else {
 //            throw new UnauthenticatedException();
 //        }      
+    }
+    
+
+    @MessageExceptionHandler(value = UnauthenticatedException.class)
+    @SendToUser(value = "/queue/authError", broadcast = false)
+    public MessageResponse handleUnauthenticationException(Exception exception) {
+        return handleException(exception);
     }
 }

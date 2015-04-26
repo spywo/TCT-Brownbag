@@ -30,7 +30,6 @@ import com.autodesk.icp.community.common.exception.BaseException;
 import com.autodesk.icp.community.common.exception.SystemException;
 import com.autodesk.icp.community.common.model.MessageResponse;
 import com.autodesk.icp.community.common.util.Consts;
-import com.autodesk.icp.community.exception.UnauthenticatedException;
 
 /**
  * @author Oliver Wu
@@ -43,7 +42,7 @@ public class BaseController {
     }
 
     @MessageExceptionHandler
-    @SendToUser(value = "/queue/errors", broadcast = false)
+    @SendToUser(value = "/queue/error", broadcast = false)
     public MessageResponse handleException(Exception exception) {
 
         MessageResponse mr = new MessageResponse();
@@ -58,11 +57,5 @@ public class BaseController {
         }
 
         return mr;
-    }
-
-    @MessageExceptionHandler(value = UnauthenticatedException.class)
-    @SendToUser(value = "/queue/authError", broadcast = false)
-    public MessageResponse handleUnauthenticationException(Exception exception) {
-        return handleException(exception);
     }
 }

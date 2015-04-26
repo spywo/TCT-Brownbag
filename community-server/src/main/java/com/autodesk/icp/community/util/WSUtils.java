@@ -66,7 +66,7 @@ public class WSUtils {
         boolean flag = false;
         String od = (String)message.getHeaders().get(SimpMessageHeaderAccessor.DESTINATION_HEADER);
 
-        if ("/app/login".equals(od)) {
+        if ("/aae/login".equals(od)) {
             flag = true;
         }
 

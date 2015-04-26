@@ -23,13 +23,11 @@
 package com.autodesk.icp.community.config;
 
 import org.springframework.context.annotation.Configuration;
-import org.springframework.messaging.simp.config.ChannelRegistration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.web.socket.config.annotation.AbstractWebSocketMessageBrokerConfigurer;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 
-import com.autodesk.icp.community.intecepter.AuthenticationChannelInterceptor;
 import com.autodesk.icp.community.intecepter.SessionHoldHandshakeInterceptor;
 
 /**
@@ -39,24 +37,18 @@ import com.autodesk.icp.community.intecepter.SessionHoldHandshakeInterceptor;
  */
 @Configuration
 @EnableWebSocketMessageBroker
-public class WebSocketConfig extends AbstractWebSocketMessageBrokerConfigurer {
+public class StompConfig extends AbstractWebSocketMessageBrokerConfigurer {
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry registry) {
-        registry.setApplicationDestinationPrefixes("/app");
+        registry.setApplicationDestinationPrefixes(new String[] {"/app"});
         registry.enableStompBrokerRelay("/queue", "/topic").setRelayHost("localhost").setRelayPort(61613);
         registry.setUserDestinationPrefix("/user");
-        
-        // config.setPathMatcher(new AntPathMatcher("."));
     }
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        registry.addEndpoint("/portfolio").withSockJS().setInterceptors(new SessionHoldHandshakeInterceptor());
-    }
-
-    @Override
-    public void configureClientInboundChannel(ChannelRegistration registration) {
-        registration.setInterceptors(new AuthenticationChannelInterceptor());
+        registry.addEndpoint("/auth").withSockJS().setInterceptors(new SessionHoldHandshakeInterceptor());   
+        registry.addEndpoint("/message").withSockJS().setInterceptors(new SessionHoldHandshakeInterceptor());        
     }
 }

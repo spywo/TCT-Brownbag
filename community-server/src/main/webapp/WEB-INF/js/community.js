@@ -4,9 +4,9 @@
             var response = JSON.parse(calResult.body);
 
             UIManager.hideLoading();
-            UIManager.showWarning("Please enter correct username and password.");
+            UIManager.showWarning("System is not available, please try again later.");
         },
-
+        
         loginSuccessHandler : function(calResult) {
             var response = JSON.parse(calResult.body);
             UserManager.setUser(response.payload);
@@ -14,13 +14,54 @@
             UIManager.activePage($("#homePage"));
             UIManager.hideLoading();
         },
-        
+
         authErrorHandler : function(calResult) {
             UIManager.activePage($("#loginPage"));
             UIManager.hideLoading();
-            
+            UIManager.showWarning("Please enter correct username and password.");
+
             $("#password").val("");
             $("#password").focus();
+        }
+    }
+})();
+
+(function() {    
+    window.AuthManager = {
+        // connect for each login transaction
+        login : function() {
+            var socket = new SockJS('/community/auth');
+            var stompClient = Stomp.over(socket);
+            
+            stompClient.connect({}, function(frame) {
+                 var sub_id_login = stompClient.subscribe('/user/queue/login', function(calResult) {
+                     releaseConnection();
+                     MsgSubscribeManager.loginSuccessHandler(calResult);
+                 });
+                 var sub_id_login_failure = stompClient.subscribe('/user/queue/authError', function(calResult) {                     
+                     releaseConnection();
+                     MsgSubscribeManager.authErrorHandler(calResult);
+                 });
+                 var sub_id_error = stompClient.subscribe('/user/queue/error', function(calResult) {                     
+                     releaseConnection();
+                     MsgSubscribeManager.errorHandler(calResult);
+                 });
+                 var releaseConnection = function() {
+                     sub_id_login.unsubscribe();
+                     sub_id_login_failure.unsubscribe();
+                     sub_id_error.unsubscribe();
+                     stompClient.disconnect(function(){}, {});
+                 };
+
+                stompClient.send("/app/login", {}, JSON.stringify({
+                    'loginId' : $("#username").val(),
+                    'password' : $("#password").val()
+                }));                
+                
+            }, function(error) {
+                UIManager.hideLoading();
+                UIManager.showWarning(error);
+            });
         }
     }
 })();
@@ -38,7 +79,7 @@
             // regenerated
             isInitSubscriptionDone = false;
 
-            var socket = new SockJS('/community/portfolio');
+            var socket = new SockJS('/community/message');
             stompClient = Stomp.over(socket);
 
             // once the browser has been closed, the disconnected frame will be
@@ -57,9 +98,7 @@
 
         var initSubscription = function() {
 
-            stompClient.subscribe('/user/queue/login', MsgSubscribeManager.loginSuccessHandler);
-            stompClient.subscribe('/user/queue/errors', MsgSubscribeManager.errorHandler);
-            stompClient.subscribe('/user/queue/authError', MsgSubscribeManager.authErrorHandler);
+//            stompClient.subscribe('/user/quthQueue/login', MsgSubscribeManager.loginSuccessHandler);             
 
             isInitSubscriptionDone = true;
         }
@@ -182,10 +221,7 @@
             $("#loginSubmit").click(function() {
                 UIManager.showLoading();
 
-                MessageClient.getInstance().send("/app/login", {}, JSON.stringify({
-                    'loginId' : $("#username").val(),
-                    'password' : $("#password").val()
-                }));
+                AuthManager.login();
             });
         }
     }
