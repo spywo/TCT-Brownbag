@@ -15,7 +15,7 @@ public class CustomAuthenticationFilter extends AbstractAuthenticationProcessing
 
     private static final String DEFAULT_FILTER_PROCESSES_URL = "/login";
     private static final String DEFAULT_FILTER_PROCESSES_METHOD = "POST";
-    
+
     public CustomAuthenticationFilter() {
         super(new AntPathRequestMatcher(DEFAULT_FILTER_PROCESSES_URL, DEFAULT_FILTER_PROCESSES_METHOD));
     }
@@ -31,5 +31,4 @@ public class CustomAuthenticationFilter extends AbstractAuthenticationProcessing
 
         return result;
     }
-
 }

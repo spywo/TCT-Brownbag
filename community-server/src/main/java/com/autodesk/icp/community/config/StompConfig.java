@@ -28,8 +28,6 @@ import org.springframework.web.socket.config.annotation.AbstractWebSocketMessage
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 
-import com.autodesk.icp.community.intecepter.AuthticationVerificationHandshakeInterceptor;
-
 /**
  * The configurer of the Web Socket endpoints.
  * 
@@ -41,13 +39,13 @@ public class StompConfig extends AbstractWebSocketMessageBrokerConfigurer {
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry registry) {
-        registry.setApplicationDestinationPrefixes(new String[] {"/app"});
+        registry.setApplicationDestinationPrefixes(new String[] { "/app" });
         registry.enableStompBrokerRelay("/queue", "/topic").setRelayHost("localhost").setRelayPort(61613);
         registry.setUserDestinationPrefix("/user");
     }
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        registry.addEndpoint("/message").withSockJS().setInterceptors(new AuthticationVerificationHandshakeInterceptor());        
+        registry.addEndpoint("/message").withSockJS();
     }
 }

@@ -22,73 +22,19 @@
 //
 package com.autodesk.icp.community.controller;
 
-import java.util.Collection;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.messaging.Message;
-import org.springframework.messaging.handler.annotation.MessageExceptionHandler;
-import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.handler.annotation.Payload;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.messaging.simp.annotation.SendToUser;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
-
-import com.autodesk.icp.community.common.model.MessageResponse;
-import com.autodesk.icp.community.common.model.User;
-import com.autodesk.icp.community.common.util.Consts;
-import com.autodesk.icp.community.exception.UnauthenticatedException;
-import com.autodesk.icp.community.service.AuthenticationService;
-import com.autodesk.icp.community.util.WSUtils;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 /**
  * @author Oliver Wu
  */
 @Controller
-public class AuthenticationController extends BaseController {
-
-    @Autowired
-    private SimpMessagingTemplate template;
-
-    @Autowired
-    private AuthenticationService authService;
-
-    @MessageMapping(value = "/login")
-    @SendToUser("/authQueue/login")
-    public MessageResponse login(Message<?> message, @Payload final User user) {
-        if (user.getLoginId().equals("ads\\wuol")) {            
-            
-            MessageResponse mr = new MessageResponse();
-            mr.setStatus(Consts.MESSAGE_STATUS_OK);
-            mr.setPayload(user);
-            
-            WSUtils.saveUser(message, user);
-            
-            
-            return mr;
-        } else {
-            throw new UnauthenticatedException();
-        }
-//        User authedUser = authService.login(user.getLoginId(), user.getPassword());
-//        
-//        if (authedUser!= null && authedUser.isAuthed()) {
-//            HttpSession session = (HttpSession)(((Map)headerAccessor.getMessageHeaders().get("simpSessionAttributes")).get(Consts.SESSION_ATTR_SESSION));
-//            session.setAttribute(Consts.SESSION_ATTR_USER, authedUser);
-//            MessageResponse mr = new MessageResponse();
-//            mr.setStatus(Consts.MESSAGE_STATUS_OK);
-//            mr.setPayload(authedUser);
-//            return mr;
-//        } else {
-//            throw new UnauthenticatedException();
-//        }      
-    }
+public class AuthenticationController {
     
-
-    @MessageExceptionHandler(value = UnauthenticatedException.class)
-    @SendToUser(value = "/authQueue/authError", broadcast = false)
-    public MessageResponse handleUnauthenticationException(Exception exception) {
-        return handleException(exception);
+    @RequestMapping(value = "/login")
+    @ResponseBody
+    public String login() {
+        return "Login succeed.";
     }
 }

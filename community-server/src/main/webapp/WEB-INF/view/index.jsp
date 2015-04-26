@@ -19,6 +19,7 @@
 <script src="js/sockjs-0.3.4.min.js"></script>
 <script src="js/stomp.min.js"></script>
 <script src="js/community.js"></script>
+<script src="js/jquery.indexeddb.js"></script>
 </head>
 <body>
 	<div class="container-fluid">

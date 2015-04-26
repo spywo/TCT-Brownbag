@@ -8,10 +8,8 @@
 		<div class="nav navbar-invers row">
 			<div role="presentation" class="active col-xs-4 col-sm-4"><span class="glyphicon glyphicon-home"></span> Home</div>
 			<div role="presentation" class="col-xs-4 col-sm-4"><span class="glyphicon glyphicon-user"></span> Profile</div>
-			<div role="presentation" class="col-xs-4 col-sm-4"><span class="glyphicon glyphicon-envelope"></span> Messages</div>
+			<div role="presentation" class="col-xs-4 col-sm-4"><span class="glyphicon glyphicon-envelope"></span> Messages <span class="badge badge-notify hide" id="msgBadge">3</span></div>
 		</div>
 	</nav>
-
-
 </div>
 

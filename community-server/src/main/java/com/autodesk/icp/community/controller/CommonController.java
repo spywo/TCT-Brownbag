@@ -22,40 +22,18 @@
 //
 package com.autodesk.icp.community.controller;
 
-import org.springframework.messaging.handler.annotation.MessageExceptionHandler;
-import org.springframework.messaging.simp.annotation.SendToUser;
+import org.springframework.security.web.csrf.CsrfToken;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
-
-import com.autodesk.icp.community.common.exception.BaseException;
-import com.autodesk.icp.community.common.exception.SystemException;
-import com.autodesk.icp.community.common.model.MessageResponse;
-import com.autodesk.icp.community.common.util.Consts;
 
 /**
  * @author Oliver Wu
  */
-public class BaseController {
+@Controller
+public class CommonController {
 
-    @RequestMapping("/home")
+    @RequestMapping(value = { "/", "/home" })
     public String index() {
         return "index";
-    }
-
-    @MessageExceptionHandler
-    @SendToUser(value = "/authQueue/error", broadcast = false)
-    public MessageResponse handleException(Exception exception) {
-
-        MessageResponse mr = new MessageResponse();
-        mr.setStatus(Consts.MESSAGE_STATUS_FAILURE);
-        if (exception instanceof BaseException) {
-            mr.setException(exception.getMessage());
-        } else {
-            SystemException se = new SystemException(SystemException.DEFAULT_ERROR_CODE,
-                                                     exception,
-                                                     exception.getMessage());
-            mr.setException(se.getMessage());
-        }
-
-        return mr;
     }
 }
