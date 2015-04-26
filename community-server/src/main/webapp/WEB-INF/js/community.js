@@ -42,15 +42,15 @@
             var stompClient = Stomp.over(socket);
             
             stompClient.connect({}, function(frame) {
-                 var sub_id_login = stompClient.subscribe('/user/queue/login', function(calResult) {
+                 var sub_id_login = stompClient.subscribe('/user/authQueue/login', function(calResult) {
                      releaseConnection();
                      MsgSubscribeManager.loginSuccessHandler(calResult);
                  });
-                 var sub_id_login_failure = stompClient.subscribe('/user/queue/authError', function(calResult) {                     
+                 var sub_id_login_failure = stompClient.subscribe('/user/authQueue/authError', function(calResult) {                     
                      releaseConnection();
                      MsgSubscribeManager.authErrorHandler(calResult);
                  });
-                 var sub_id_error = stompClient.subscribe('/user/queue/error', function(calResult) {                     
+                 var sub_id_error = stompClient.subscribe('/user/authQueue/error', function(calResult) {                     
                      releaseConnection();
                      MsgSubscribeManager.errorHandler(calResult);
                  });

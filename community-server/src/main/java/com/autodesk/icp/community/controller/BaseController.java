@@ -42,7 +42,7 @@ public class BaseController {
     }
 
     @MessageExceptionHandler
-    @SendToUser(value = "/queue/error", broadcast = false)
+    @SendToUser(value = "/authQueue/error", broadcast = false)
     public MessageResponse handleException(Exception exception) {
 
         MessageResponse mr = new MessageResponse();

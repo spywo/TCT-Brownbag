@@ -29,7 +29,6 @@ import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBr
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 
 import com.autodesk.icp.community.intecepter.AuthticationVerificationHandshakeInterceptor;
-import com.autodesk.icp.community.intecepter.SessionHoldHandshakeInterceptor;
 
 /**
  * The configurer of the Web Socket endpoints.
@@ -49,7 +48,6 @@ public class StompConfig extends AbstractWebSocketMessageBrokerConfigurer {
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        registry.addEndpoint("/auth").withSockJS().setInterceptors(new SessionHoldHandshakeInterceptor());   
         registry.addEndpoint("/message").withSockJS().setInterceptors(new AuthticationVerificationHandshakeInterceptor());        
     }
 }

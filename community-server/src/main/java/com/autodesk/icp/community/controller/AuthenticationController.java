@@ -56,7 +56,7 @@ public class AuthenticationController extends BaseController {
     private AuthenticationService authService;
 
     @MessageMapping(value = "/login")
-    @SendToUser("/queue/login")
+    @SendToUser("/authQueue/login")
     public MessageResponse login(Message<?> message, @Payload final User user) {
         if (user.getLoginId().equals("ads\\wuol")) {            
             
@@ -87,7 +87,7 @@ public class AuthenticationController extends BaseController {
     
 
     @MessageExceptionHandler(value = UnauthenticatedException.class)
-    @SendToUser(value = "/queue/authError", broadcast = false)
+    @SendToUser(value = "/authQueue/authError", broadcast = false)
     public MessageResponse handleUnauthenticationException(Exception exception) {
         return handleException(exception);
     }
