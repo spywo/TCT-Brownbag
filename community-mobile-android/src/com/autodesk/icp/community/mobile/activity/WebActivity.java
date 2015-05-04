@@ -1,8 +1,11 @@
 package com.autodesk.icp.community.mobile.activity;
 
+import java.util.Map;
+
 import android.app.Activity;
 import android.net.http.SslError;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -11,6 +14,10 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
+import com.autodesk.icp.community.mobile.stomp.ListenerSubscription;
+import com.autodesk.icp.community.mobile.stomp.ListenerWSNetwork;
+import com.autodesk.icp.community.mobile.stomp.Stomp;
+import com.autodesk.icp.community.mobile.stomp.Subscription;
 import com.autodesk.icp.community.mobile.util.WebAppInterface;
 
 public class WebActivity extends Activity {
@@ -24,9 +31,7 @@ public class WebActivity extends Activity {
         webView = (WebView)findViewById(R.id.mainWebView);
 
         webView.loadUrl("http://10.148.202.55:8080/community/home");
-
-        // myWebView.loadUrl("file:///android_asset/www/test2.html");
-
+       
         webView.setWebViewClient(new WebViewClient() {
             @Override
             public void onReceivedSslError(WebView view, SslErrorHandler handler, SslError error) {
@@ -39,6 +44,41 @@ public class WebActivity extends Activity {
         webSettings.setJavaScriptEnabled(true);
 
         webView.addJavascriptInterface(new WebAppInterface(this), "Android");
+        
+        new Thread() {
+            /* (non-Javadoc)
+             * @see java.lang.Thread#run()
+             */
+            @Override
+            public void run() {
+                Map<String,String> headersSetup = null;//new HashMap<String,String>();
+                Stomp stomp = new Stomp("ws://10.148.202.55:8080/community/message", headersSetup, new ListenerWSNetwork() {
+                    
+                    @Override
+                    public void onState(int state) {
+                        // TODO Auto-generated method stub
+                        
+                    }
+                });
+                stomp.connect();
+                
+                try {
+                    Thread.sleep(2000);
+                } catch (InterruptedException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+                
+                stomp.subscribe(new Subscription("/topic/notification", new ListenerSubscription() {
+
+                    @Override
+                    public void onMessage(Map<String, String> headers, String body) {
+                       Log.d("STOMP", body);
+
+                    }
+                }));
+            }
+        }.start();
     }
 
     @Override

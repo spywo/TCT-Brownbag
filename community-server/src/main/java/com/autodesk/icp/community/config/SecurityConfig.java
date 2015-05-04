@@ -24,11 +24,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.csrf().disable();
-        http.authorizeRequests().antMatchers("/home", "/login").permitAll().anyRequest().authenticated();
+        http.authorizeRequests().antMatchers("/adminLogin").permitAll().anyRequest().authenticated();
         
         http.authenticationProvider(customAuthenticationProvider());
         
-
         http.addFilterBefore(customAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
     }
 

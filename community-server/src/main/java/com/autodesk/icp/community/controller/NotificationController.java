@@ -35,7 +35,7 @@ public class NotificationController {
     @Autowired
     private SimpMessagingTemplate template;
   
-    @RequestMapping("/message")
+    @RequestMapping("/sendmessage")
     public void message() {
         template.convertAndSend("/topic/notification", "{\"name\":\"dummy\", \"body\":\"HelloWorld\"}");
     }

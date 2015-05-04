@@ -22,6 +22,7 @@
 //
 package com.autodesk.icp.community.config;
 
+import javax.servlet.FilterRegistration;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRegistration.Dynamic;
@@ -31,15 +32,26 @@ import org.springframework.web.context.ContextLoaderListener;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
 import org.springframework.web.servlet.DispatcherServlet;
 
+import com.autodesk.icp.community.authentication.CORSFilter;
+
 /**
  * Servlet 3.0 web app initializer.
  * 
  * @author Oliver Wu
  */
-public class DispatcherServletInitializer implements WebApplicationInitializer {
+public class WebAppInitializer implements WebApplicationInitializer {
 
     @Override
     public void onStartup(ServletContext container) throws ServletException {
+        registerSpringContext(container);
+
+        registerCORS(container);
+    }
+
+    /**
+     * @param container
+     */
+    private void registerSpringContext(ServletContext container) {
         // Create the 'root' Spring application context
         AnnotationConfigWebApplicationContext rootContext = new AnnotationConfigWebApplicationContext();
         rootContext.register(AppConfig.class);
@@ -51,12 +63,21 @@ public class DispatcherServletInitializer implements WebApplicationInitializer {
         AnnotationConfigWebApplicationContext dispatcherContext = new AnnotationConfigWebApplicationContext();
         dispatcherContext.register(MVCConfig.class);
         dispatcherContext.register(SecurityConfig.class);
-        dispatcherContext.register(StompConfig.class);        
+        dispatcherContext.register(StompConfig.class);
 
         // Register and map the dispatcher servlet
         Dynamic dispatcher = container.addServlet("dispatcher", new DispatcherServlet(dispatcherContext));
         dispatcher.setAsyncSupported(true);
         dispatcher.setLoadOnStartup(1);
-        dispatcher.addMapping("/");        
+        dispatcher.addMapping("/");
     }
+
+    /**
+     * @param container
+     */
+    private void registerCORS(ServletContext container) {
+        FilterRegistration.Dynamic corsFilter = container.addFilter("corsFilter", CORSFilter.class);
+        corsFilter.addMappingForUrlPatterns(null, false, "/*");
+    }
+
 }

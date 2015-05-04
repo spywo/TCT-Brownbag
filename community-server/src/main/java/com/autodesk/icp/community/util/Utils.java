@@ -26,6 +26,6 @@ package com.autodesk.icp.community.util;
 /**
  * @author Oliver Wu
  */
-public class WSUtils {
+public class Utils {
 
 }
