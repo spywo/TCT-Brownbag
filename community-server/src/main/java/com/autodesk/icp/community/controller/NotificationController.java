@@ -37,6 +37,6 @@ public class NotificationController {
   
     @RequestMapping("/message")
     public void message() {
-        template.convertAndSend("/topic/notification", "nihao");
+        template.convertAndSend("/topic/notification", "{\"name\":\"dummy\", \"body\":\"HelloWorld\"}");
     }
 }

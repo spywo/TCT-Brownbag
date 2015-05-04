@@ -9,7 +9,6 @@
 	</div>
 </div>
 
-
 <div id="warning_overlay" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="warning_overlay_label" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content text-center">

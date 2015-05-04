@@ -2,14 +2,25 @@
     window.MsgSubscribeManager = {
         notificationHandler : function(calResult) {
 
-            var objectStore = $.indexedDB("Community-DB").objectStore("notification");
-//            objectStore.add(calResult.body).done(function(){                
-//            });;
-//
-//            var count = objectStore.count();
+            $.indexedDB("CommunityDB").transaction([ "Notification" ], "readwrite").then(function() {
+                console.log("Transaction completed");
+            }, function() {
+                console.log("Transaction aborted");
+            }, function(t) {
+                console.log("Transaction in progress");
+                t.objectStore("Notification").add(calResult.body).then(function(result, event) {
+                    console.log("Data added");
 
-            $("#msgBadge").text(2);
-            $("#msgBadge").removeClass('hide');
+                    var promise = t.objectStore("Notification").count();
+                    promise.done(function(result, event) {
+                        $("#msgBadge").text(result);
+                        $("#msgBadge").removeClass('hide');
+                    });
+
+                }, function(error, event) {
+                    console.log("Error adding data");
+                });
+            });
 
             UIManager.hideLoading();
         },
@@ -157,9 +168,44 @@
 
                 AuthManager.login();
             });
+        },
+        
+        registerTabNavButtonClick : function() {
+            
+            $("#homePage .navbar-fixed-bottom  [role='presentation']").each(function(index, element){                
+                $(element).click(function() {
+                    $("#homePage #mainContent .page-content").hide();
+                    
+                    $("#"+$(element).attr("targetContent")).removeClass("hide");
+                    $("#"+$(element).attr("targetContent")).fadeIn(2000);
+                    
+                    $("#homePage .navbar-fixed-bottom  [role='presentation']").removeClass("active");
+                    $(element).addClass("active");
+                });
+                
+                $(element).css("cursor", "pointer");
+            });
         }
     }
 })(jQuery);
+
+$(function() {
+    $.indexedDB("CommunityDB", {
+        "version" : 2,
+        "upgrade" : function(transaction) {
+        },
+        "schema" : {
+            "2" : function(transaction) {
+                transaction.createObjectStore("Notification", {
+                    // "keyPath": "id",
+                    "autoIncrement" : true
+                });
+            },
+        }
+    }).done(function(db, event) {
+        console.log("Successfully opened DB.");
+    });
+})
 
 $(function() {
     // for mobile app there is only one window
@@ -167,21 +213,6 @@ $(function() {
         UIManager.activePage($("#loginPage"));
     }
 
-    UIEventManager.registerLoginSubmit();
+    UIEventManager.registerLoginSubmit();    
+    UIEventManager.registerTabNavButtonClick();
 });
-
-$(function() {
-    $.indexedDB("Community-DB", {
-        "schema" : {
-            "1" : function(versionTransaction) {
-                var notificationTable = versionTransaction.createObjectStore("notification", {
-                    "keyPath" : "id",
-                    "autoIncrement" : true
-                });
-                notificationTable.createIndex("id");
-            }
-        }
-    }).done(function() {
-
-    });
-})

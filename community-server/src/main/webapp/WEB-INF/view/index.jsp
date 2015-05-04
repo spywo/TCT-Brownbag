@@ -9,6 +9,7 @@
 
 <!-- Bootstrap -->
 <link href="css/bootstrap.min.css" rel="stylesheet">
+
 <link href="css/community.css" rel="stylesheet">
 
 <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
@@ -18,16 +19,17 @@
 
 <script src="js/sockjs-0.3.4.min.js"></script>
 <script src="js/stomp.min.js"></script>
-<script src="js/community.js"></script>
 <script src="js/jquery.indexeddb.js"></script>
+
+<%@include file="scripts.jsp"%>
 </head>
 <body>
 	<div class="container-fluid">
-		
+
 		<%@include file="common.jsp"%>
 		<%@include file="login.jsp"%>
 		<%@include file="home.jsp"%>
-			
+
 	</div>
 </body>
 </html>
