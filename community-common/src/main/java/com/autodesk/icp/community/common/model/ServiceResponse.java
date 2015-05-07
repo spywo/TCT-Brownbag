@@ -26,7 +26,7 @@ package com.autodesk.icp.community.common.model;
 /**
  * @author Oliver Wu
  */
-public class MessageResponse {
+public class ServiceResponse {
     private String status;
     private String exception;
     private Object payload;

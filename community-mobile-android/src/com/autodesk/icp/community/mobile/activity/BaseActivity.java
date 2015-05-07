@@ -20,15 +20,36 @@
 // Software Restricted Rights) and DFAR 252.227-7013(c)(1)(ii)
 // (Rights in Technical Data and Computer Software), as applicable.
 //
-package com.autodesk.icp.community.controller;
+package com.autodesk.icp.community.mobile.activity;
 
-import org.springframework.stereotype.Controller;
+import android.app.Activity;
+import android.view.Gravity;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 
 /**
  * @author Oliver Wu
  */
-@Controller
-public class AuthenticationController {
+public class BaseActivity extends Activity {
     
+    protected ProgressBar createProgressBar() {
+        ViewGroup layout = (ViewGroup)findViewById(android.R.id.content).getRootView();
 
+        ProgressBar progressBar = new ProgressBar(this, null, android.R.attr.progressBarStyleLarge);
+        progressBar.setIndeterminate(true);
+        progressBar.setVisibility(View.VISIBLE);
+
+        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT,
+                                                                             RelativeLayout.LayoutParams.MATCH_PARENT);
+
+        RelativeLayout rl = new RelativeLayout(this);
+        rl.setGravity(Gravity.CENTER);
+        rl.addView(progressBar);
+
+        layout.addView(rl, params);
+
+        return progressBar;
+    }
 }

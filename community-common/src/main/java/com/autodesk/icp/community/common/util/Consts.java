@@ -26,8 +26,8 @@ package com.autodesk.icp.community.common.util;
  * @author Oliver Wu
  */
 public class Consts {
-    public final static String MESSAGE_STATUS_OK = "OK";
-    public final static String MESSAGE_STATUS_FAILURE = "Error";
+    public final static String SERVICE_STATUS_OK = "OK";
+    public final static String SERVICE_STATUS_FAILURE = "Error";
     
     public final static String SESSION_ATTR_SESSION = "CURRENT_HTTP_SESSION";
     public final static String SESSION_ATTR_USER = "HTTP_SESSION_USER";

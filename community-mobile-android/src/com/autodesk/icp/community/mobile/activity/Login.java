@@ -1,13 +1,21 @@
 package com.autodesk.icp.community.mobile.activity;
 
-import android.app.Activity;
+import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.RestTemplate;
+
 import android.app.AlertDialog;
-import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.view.View;
 import android.widget.EditText;
 
-public class Login extends Activity {
+import com.autodesk.icp.community.common.model.ServiceResponse;
+
+public class Login extends BaseActivity {
     private EditText mUser;
     private EditText mPassword;
 
@@ -26,12 +34,23 @@ public class Login extends Activity {
             return;
         }
         
-        if ("test".equals(mUser.getText().toString()) && "123".equals(mPassword.getText().toString()))
+        if ("test".equals(mUser.getText().toString()) && "123".equals(mPassword.getText().toString())) {
+            final Handler myHandler = new Handler() {
+                public void handleMessage(Message msg) {
 
-        {
-            Intent intent = new Intent();
-            intent.setClass(Login.this, LoadingActivity.class);
-            startActivity(intent);
+                }
+            };
+            
+            new Thread() {
+                public void run() {      
+                    authenticate(mUser.getText().toString(), mPassword.getText().toString());
+                    Message msg = myHandler.obtainMessage();
+                    Bundle b = new Bundle();
+                    b.putString("key", "value");
+                    msg.setData(b);    
+                    myHandler.sendMessage(msg);  
+                }
+            }.start();            
         }
     }
 
@@ -62,4 +81,18 @@ public class Login extends Activity {
         }
         return true;
     }
+    
+    private boolean authenticate(String username, String password) {
+        String url = "http://10.148.202.55:8080/community/login";
+        
+        RestTemplate restTemplate = new RestTemplate();
+        restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter ());
+        
+        MultiValueMap<String, String> postbody = new LinkedMultiValueMap<String, String>();
+        postbody.add("username", username);
+        postbody.add("password", password);
+        
+        ResponseEntity<ServiceResponse> result = restTemplate.postForEntity(url, postbody, ServiceResponse.class);
+        return true;        
+    }    
 }

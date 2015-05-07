@@ -23,7 +23,6 @@
 package com.autodesk.icp.community.controller;
 
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
 
 /**
  * @author Oliver Wu
@@ -31,8 +30,4 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @Controller
 public class CommonController {
 
-    @RequestMapping(value = { "/", "/home" })
-    public String index() {
-        return "index";
-    }
 }
