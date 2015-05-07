@@ -41,7 +41,7 @@ public class StompConfig extends AbstractWebSocketMessageBrokerConfigurer {
     public void configureMessageBroker(MessageBrokerRegistry registry) {
         registry.setApplicationDestinationPrefixes(new String[] { "/app" });
         registry.enableStompBrokerRelay("/queue", "/topic").setRelayHost("localhost").setRelayPort(61613);
-        registry.setUserDestinationPrefix("/user");
+        registry.setUserDestinationPrefix("/user");        
     }
 
     @Override

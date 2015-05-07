@@ -2,7 +2,19 @@
 <resources>
 
     <string name="app_name">Community</string>
-    <string name="hello_world">Hello world!</string>
+    
+    <!-- UI sentence -->
+    <string name="label_login">Login</string>
+    <string name="label_login_info">Please use Autodesk employee id to login</string>
+    <string name="label_back">Back</string>
+    <string name="label_username_hint">Autodesk ID (ads\\)</string>
+    <string name="label_password_hint">Password</string>
+    <string name="label_warning">Warning</string>
+    <string name="label_username_invalid_empty">Username cannot be empty.</string>
+    <string name="label_password_invalid_empty">Password cannot be empty.</string>
+    <string name="label_password_invalid_incorrect">Password may not be correct.</string>
+    <string name="label_loading">Loading...</string>
+        
     <string name="action_settings">Settings</string>
 
 </resources>

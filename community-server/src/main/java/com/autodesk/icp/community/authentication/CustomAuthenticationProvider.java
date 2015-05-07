@@ -33,7 +33,7 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
         User authedUser = new User();//authService.login(name, password);
         authedUser.setLoginId(name);
         authedUser.setDisplayName(name);
-        authedUser.setName(name);
+        authedUser.setName("wuol");
         if (password.isEmpty()) {
             authedUser.setAuthed(false);
         } else {
