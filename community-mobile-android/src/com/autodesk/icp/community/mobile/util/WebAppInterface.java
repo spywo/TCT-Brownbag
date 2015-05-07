@@ -1,8 +1,8 @@
 package com.autodesk.icp.community.mobile.util;  
   
-import android.content.Context;  
-import android.webkit.JavascriptInterface;  
-import android.widget.Toast;  
+import android.content.Context;
+import android.webkit.JavascriptInterface;
+import android.widget.Toast;
   
 public class WebAppInterface {  
     Context mContext;  

@@ -64,8 +64,6 @@ import com.autodesk.icp.community.common.util.JSONReadWriteHelper;
  * </ul>
  * 
  * @author Oliver
- * @see <code>com.autodesk.infraworks360.traffic.common.exception.BusinessException</code>
- *      <code>com.autodesk.infraworks360.traffic.common.exception.SystemException</code>
  */
 public abstract class BaseException extends RuntimeException {
     private static final long serialVersionUID = -708067741229515162L;

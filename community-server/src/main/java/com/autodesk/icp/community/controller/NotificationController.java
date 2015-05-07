@@ -25,6 +25,7 @@ package com.autodesk.icp.community.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 /**
  * @author Oliver Wu
@@ -34,11 +35,8 @@ public class NotificationController {
     @Autowired
     private SimpMessagingTemplate template;
   
-
-//    @MessageMapping(value = "/login")
-//    @SendTo("/user/queue/login")
-//    public String login(String greeting) {
-//        String text = "[" + "]:" + greeting;
-//        return text;
-//    }
+    @RequestMapping("/sendmessage")
+    public void message() {
+        template.convertAndSend("/topic/notification", "{\"name\":\"dummy\", \"body\":\"HelloWorld\"}");
+    }
 }

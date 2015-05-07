@@ -22,50 +22,13 @@
 //
 package com.autodesk.icp.community.controller;
 
-import java.util.Map;
-
-import javax.servlet.http.HttpSession;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.handler.annotation.Payload;
-import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.messaging.simp.annotation.SendToUser;
 import org.springframework.stereotype.Controller;
-
-import com.autodesk.icp.community.common.model.MessageResponse;
-import com.autodesk.icp.community.common.model.User;
-import com.autodesk.icp.community.common.util.Consts;
-import com.autodesk.icp.community.exception.UnauthenticatedException;
-import com.autodesk.icp.community.service.AuthenticationService;
 
 /**
  * @author Oliver Wu
  */
 @Controller
-public class AuthenticationController extends BaseController {
+public class AuthenticationController {
+    
 
-    @Autowired
-    private SimpMessagingTemplate template;
-
-    @Autowired
-    private AuthenticationService authService;
-
-    @MessageMapping(value = "/login")
-    @SendToUser("/queue/login")
-    public MessageResponse login(@Payload User user, SimpMessageHeaderAccessor headerAccessor) {
-        User authedUser = authService.login(user.getLoginId(), user.getPassword());
-        
-        if (authedUser!= null && authedUser.isAuthed()) {
-            HttpSession session = (HttpSession)(((Map)headerAccessor.getMessageHeaders().get("simpSessionAttributes")).get(Consts.SESSION_ATTR_SESSION));
-            session.setAttribute(Consts.SESSION_ATTR_USER, authedUser);
-            MessageResponse mr = new MessageResponse();
-            mr.setStatus(Consts.MESSAGE_STATUS_OK);
-            mr.setPayload(authedUser);
-            return mr;
-        } else {
-            throw new UnauthenticatedException();
-        }      
-    }
 }

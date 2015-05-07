@@ -34,8 +34,9 @@ import org.springframework.stereotype.Service;
  * @author Oliver Wu
  */
 @Configuration
-@ComponentScan(basePackages = "com.autodesk.icp.community", excludeFilters = { @ComponentScan.Filter(value = Service.class, type = FilterType.ANNOTATION),
-                                                                    @ComponentScan.Filter(value = Component.class, type = FilterType.ANNOTATION) })
+@ComponentScan(basePackages = "com.autodesk.icp.community", includeFilters = { @ComponentScan.Filter(value = Service.class, type = FilterType.ANNOTATION),
+                                                                              @ComponentScan.Filter(value = Component.class, type = FilterType.ANNOTATION) })
+//@EnableAspectJAutoProxy
 public class AppConfig {
 
 }
