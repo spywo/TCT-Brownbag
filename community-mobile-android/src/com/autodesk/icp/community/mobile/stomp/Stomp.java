@@ -139,8 +139,7 @@ public class Stomp {
                         Log.d(TAG, "Web Socket disconnected");
                         disconnectFromApp();
                     } else {
-                        Log.w(TAG, "Problem : Web Socket disconnected whereas Stomp disconnect method has never "
-                                   + "been called.");
+                        Log.w(TAG, "Problem : Web Socket disconnected whereas Stomp disconnect method has never been called.");
                         disconnectFromServer();
                     }
                 }
@@ -192,7 +191,11 @@ public class Stomp {
     /**
      * Set up a web socket connection with a server
      */
-    public void connect() {
+    public void connect(Map<String, String> headers) {
+        if (headers != null) {
+            this.headers.putAll(headers);
+        }
+        
         if (this.connection != CONNECTED) {
             Log.d(TAG, "Opening Web Socket...");
             try {
@@ -265,16 +268,19 @@ public class Stomp {
      * @param subscription
      *            a subscription object
      */
-    public void subscribe(Subscription subscription) {
+    public void subscribe(Subscription subscription, Map<String, String> headers) {
         subscription.setId(PREFIX_ID_SUBSCIPTION + this.counter++);
         this.subscriptions.put(subscription.getId(), subscription);
 
         if (this.connection == CONNECTED) {
-            Map<String, String> headers = new HashMap<String, String>();
-            headers.put(SUBSCRIPTION_ID, subscription.getId());
-            headers.put(SUBSCRIPTION_DESTINATION, subscription.getDestination());
+            Map<String, String> combinedheaders = new HashMap<String, String>();
+            combinedheaders.put(SUBSCRIPTION_ID, subscription.getId());
+            combinedheaders.put(SUBSCRIPTION_DESTINATION, subscription.getDestination());
+            if (headers != null) {
+                combinedheaders.putAll(headers);
+            }
 
-            subscribe(headers);
+            subscribe(combinedheaders);
         }
     }
 

@@ -22,26 +22,9 @@
 //
 package com.autodesk.icp.community.common.model;
 
-import java.security.Principal;
-
 /**
  * @author Oliver Wu
  */
-public class UserPrinciple implements Principal {
-
-    private User user;
-
-    public UserPrinciple(User user) {
-        this.user = user;
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see java.security.Principal#getName()
-     */
-    @Override
-    public String getName() {
-        return user.getName();
-    }
-
+public enum ServiceStatus {
+    OK, FAILURE
 }

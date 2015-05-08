@@ -13,7 +13,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import com.autodesk.icp.community.common.model.User;
-import com.autodesk.icp.community.common.model.UserPrinciple;
+import com.autodesk.icp.community.common.model.UserPrincipal;
 import com.autodesk.icp.community.service.AuthenticationService;
 
 public class CustomAuthenticationProvider implements AuthenticationProvider {
@@ -32,8 +32,8 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
 
         User authedUser = new User();//authService.login(name, password);
         authedUser.setLoginId(name);
-        authedUser.setDisplayName(name);
-        authedUser.setName("wuol");
+        authedUser.setDisplayName(name);   
+        authedUser.setName("dummyUser");
         if (password.isEmpty()) {
             authedUser.setAuthed(false);
         } else {
@@ -43,7 +43,7 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
 
             List<GrantedAuthority> authorities = new ArrayList<>();
             authorities.add(new SimpleGrantedAuthority("USER_ROLE"));
-            UsernamePasswordAuthenticationToken authenticated = new UsernamePasswordAuthenticationToken(new UserPrinciple(authedUser),
+            UsernamePasswordAuthenticationToken authenticated = new UsernamePasswordAuthenticationToken(new UserPrincipal(authedUser),
                                                                                                         password,
                                                                                                         authorities);
 

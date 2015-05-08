@@ -1,6 +1,8 @@
 package com.autodesk.icp.community.mobile.activity;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -21,6 +23,12 @@ import android.view.animation.TranslateAnimation;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
+
+import com.autodesk.icp.community.mobile.stomp.ListenerSubscription;
+import com.autodesk.icp.community.mobile.stomp.ListenerWSNetwork;
+import com.autodesk.icp.community.mobile.stomp.Stomp;
+import com.autodesk.icp.community.mobile.stomp.Subscription;
+import com.autodesk.icp.community.mobile.util.SessionManager;
 
 public class MainCommunity extends Activity {
 
@@ -107,6 +115,8 @@ public class MainCommunity extends Activity {
         };
 
         mTabPager.setAdapter(mPagerAdapter);
+        
+        subscribe();
     }
 
     public class MyOnClickListener implements View.OnClickListener {
@@ -258,5 +268,44 @@ public class MainCommunity extends Activity {
     public void btn_shake(View v) { 
         Intent intent = new Intent(MainCommunity.this, ShakeActivity.class);
         startActivity(intent);
+    }
+    
+    
+    private void subscribe() {
+        new Thread() {
+            /* (non-Javadoc)
+             * @see java.lang.Thread#run()
+             */
+            @Override
+            public void run() {
+                SessionManager sm = new SessionManager(MainCommunity.this);
+                Map<String,String> headersSetup = new HashMap<String,String>();
+                headersSetup.put("Cookie", "JSESSIONID=".concat(sm.getJSESSIONID()));
+                Stomp stomp = new Stomp("ws://10.148.202.55:8080/community/message", headersSetup, new ListenerWSNetwork() {                    
+                    @Override
+                    public void onState(int state) {
+                        // TODO Auto-generated method stub
+                        
+                    }
+                });
+                
+                Map<String,String> connectHeasers = new HashMap<String,String>();
+                connectHeasers.put("client-id", sm.getUserDetails().getName());
+                stomp.connect(connectHeasers);
+                
+                
+                Map<String,String> subscribeHeasers = new HashMap<String,String>();
+                subscribeHeasers.put("activemq.subscriptionName", sm.getUserDetails().getName());
+                stomp.subscribe(new Subscription("/topic/notification", new ListenerSubscription() {
+
+                    @Override
+                    public void onMessage(Map<String, String> headers, String body) {
+                        System.out.println(body);
+
+                    }
+                }), subscribeHeasers);
+            }
+        }.start();
+        
     }
 }

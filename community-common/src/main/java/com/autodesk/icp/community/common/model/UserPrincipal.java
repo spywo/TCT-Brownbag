@@ -22,72 +22,44 @@
 //
 package com.autodesk.icp.community.common.model;
 
+import java.security.Principal;
+
 /**
  * @author Oliver Wu
  */
-public class ServiceResponse<T> {
-    private ServiceStatus status;
-    private ServiceError error;
-    private T payload;
+public class UserPrincipal implements Principal {
 
-    public ServiceResponse(ServiceStatus status, ServiceError error) {
-        super();
-        this.status = status;
-        this.error = error;
+    private User user;
+    
+    public UserPrincipal() {
+        
     }
 
-    public ServiceResponse(ServiceStatus status, T payload) {
-        super();
-        this.status = status;
-        this.payload = payload;
+    public UserPrincipal(User user) {
+        this.user = user;
     }
 
-    public ServiceResponse() {
-        super();
+    /*
+     * (non-Javadoc)
+     * @see java.security.Principal#getName()
+     */
+    @Override
+    public String getName() {
+        return user.getName();
     }
 
     /**
-     * @return the status
+     * @return the user
      */
-    public ServiceStatus getStatus() {
-        return status;
+    public User getUser() {
+        return user;
     }
 
     /**
-     * @param status
-     *            the status to set
+     * @param user the user to set
      */
-    public void setStatus(ServiceStatus status) {
-        this.status = status;
+    public void setUser(User user) {
+        this.user = user;
     }
 
-    /**
-     * @return the payload
-     */
-    public T getPayload() {
-        return payload;
-    }
-
-    /**
-     * @param payload
-     *            the payload to set
-     */
-    public void setPayload(T payload) {
-        this.payload = payload;
-    }
-
-    /**
-     * @return the error
-     */
-    public ServiceError getError() {
-        return error;
-    }
-
-    /**
-     * @param error
-     *            the error to set
-     */
-    public void setError(ServiceError error) {
-        this.error = error;
-    }
 }
