@@ -10,8 +10,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 
+import com.autodesk.icp.community.common.model.ServiceError;
 import com.autodesk.icp.community.common.model.ServiceResponse;
-import com.autodesk.icp.community.common.util.Consts;
+import com.autodesk.icp.community.common.model.ServiceStatus;
+import com.autodesk.icp.community.common.model.User;
+import com.autodesk.icp.community.common.model.UserPrincipal;
 import com.autodesk.icp.community.common.util.JSONReadWriteHelper;
 
 public class CustomAuthenticationSuccessHandler implements AuthenticationSuccessHandler {
@@ -22,9 +25,7 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
         response.setContentType("application/json;charset=UTF-8");
         response.setHeader("Cache-Control", "no-cache");
         
-        ServiceResponse sr = new ServiceResponse();
-        sr.setStatus(Consts.SERVICE_STATUS_OK);
-        sr.setPayload(auth.getPrincipal());
+        ServiceResponse<User> sr = new ServiceResponse<User>(ServiceStatus.OK, ((UserPrincipal)auth.getPrincipal()).getUser());
         response.getWriter().write(JSONReadWriteHelper.serializeToJSON(sr));
 
         response.setStatus(HttpStatus.OK.value());

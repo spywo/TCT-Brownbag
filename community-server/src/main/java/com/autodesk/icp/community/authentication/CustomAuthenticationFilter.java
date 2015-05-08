@@ -14,7 +14,7 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 public class CustomAuthenticationFilter extends AbstractAuthenticationProcessingFilter {
 
     private static final String DEFAULT_FILTER_PROCESSES_URL = "/login";
-    private static final String DEFAULT_FILTER_PROCESSES_METHOD = "GET";
+    private static final String DEFAULT_FILTER_PROCESSES_METHOD = "POST";
 
     public CustomAuthenticationFilter() {
         super(new AntPathRequestMatcher(DEFAULT_FILTER_PROCESSES_URL, DEFAULT_FILTER_PROCESSES_METHOD));
