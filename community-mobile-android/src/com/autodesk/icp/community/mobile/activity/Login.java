@@ -10,6 +10,7 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 import android.app.AlertDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -43,20 +44,26 @@ public class Login extends BaseActivity {
         if ("test".equals(mUser.getText().toString()) && "123".equals(mPassword.getText().toString())) {
             final Handler myHandler = new Handler() {
                 public void handleMessage(Message msg) {
-
+                    if (msg.getData().getBoolean("flag")) {
+                        Intent intent = new Intent(Login.this, MainCommunity.class);
+                        startActivity(intent);
+                        Login.this.finish();
+                    }
                 }
             };
 
             new Thread() {
                 public void run() {
+                    
                     authenticate(mUser.getText().toString(), mPassword.getText().toString());
                     Message msg = myHandler.obtainMessage();
                     Bundle b = new Bundle();
-                    b.putString("key", "value");
+                    b.putBoolean("flag", true);
                     msg.setData(b);
                     myHandler.sendMessage(msg);
                 }
             }.start();
+               
         }
     }
 

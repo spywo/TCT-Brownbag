@@ -22,34 +22,38 @@
 //
 package com.autodesk.icp.community.mobile.activity;
 
+
 import android.app.Activity;
+import android.graphics.Color;
 import android.view.Gravity;
 import android.view.View;
-import android.view.ViewGroup;
+import android.widget.LinearLayout;
+import android.widget.LinearLayout.LayoutParams;
 import android.widget.ProgressBar;
-import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 /**
  * @author Oliver Wu
  */
 public class BaseActivity extends Activity {
-    
-    protected ProgressBar createProgressBar() {
-        ViewGroup layout = (ViewGroup)findViewById(android.R.id.content).getRootView();
 
-        ProgressBar progressBar = new ProgressBar(this, null, android.R.attr.progressBarStyleLarge);
-        progressBar.setIndeterminate(true);
-        progressBar.setVisibility(View.VISIBLE);
-
-        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT,
-                                                                             RelativeLayout.LayoutParams.MATCH_PARENT);
-
-        RelativeLayout rl = new RelativeLayout(this);
-        rl.setGravity(Gravity.CENTER);
-        rl.addView(progressBar);
-
-        layout.addView(rl, params);
-
-        return progressBar;
+    protected void createProgressBar() {
+        LinearLayout mProgressLayout = new LinearLayout(this);
+        mProgressLayout.setMinimumHeight(30);
+        mProgressLayout.setGravity(Gravity.CENTER);
+        mProgressLayout.setOrientation(LinearLayout.HORIZONTAL);
+        LayoutParams mLayoutParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT,
+                                                                   LinearLayout.LayoutParams.WRAP_CONTENT);
+        ProgressBar mProgressBar = new ProgressBar(this);
+        mProgressBar.setPadding(100, 250, 5, 80);
+        mProgressLayout.addView(mProgressBar, mLayoutParams);
+        TextView mContent = new TextView(this);
+        mContent.setText("Loading...");
+        mContent.setTextSize(19);
+        mContent.setTextColor(Color.BLACK);
+        mContent.setPadding(0, 250, 0, 80);
+        mProgressLayout.addView(mContent, mLayoutParams);
+        mProgressLayout.setVisibility(View.VISIBLE);
+        this.addContentView(mProgressLayout, mLayoutParams);
     }
 }

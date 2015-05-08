@@ -32,8 +32,8 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
 
         User authedUser = new User();//authService.login(name, password);
         authedUser.setLoginId(name);
-        authedUser.setDisplayName(name);
-        authedUser.setName("wuol");
+        authedUser.setDisplayName(name);   
+        authedUser.setName("dummyUser");
         if (password.isEmpty()) {
             authedUser.setAuthed(false);
         } else {
