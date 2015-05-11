@@ -281,10 +281,6 @@ public class MainCommunity extends BaseActivity {
 
     private void subscribe() {
         new Thread() {
-            /*
-             * (non-Javadoc)
-             * @see java.lang.Thread#run()
-             */
             @Override
             public void run() {
                 SessionManager sm = new SessionManager(MainCommunity.this);
