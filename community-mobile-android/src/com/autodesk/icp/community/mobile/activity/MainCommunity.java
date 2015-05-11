@@ -4,10 +4,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-import android.app.Activity;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+
 import android.content.Intent;
 import android.graphics.Point;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
@@ -24,13 +27,19 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 
+import com.autodesk.icp.community.common.model.ServiceResponse;
+import com.autodesk.icp.community.common.model.User;
+import com.autodesk.icp.community.common.util.JSONReadWriteHelper;
 import com.autodesk.icp.community.mobile.stomp.ListenerSubscription;
 import com.autodesk.icp.community.mobile.stomp.ListenerWSNetwork;
 import com.autodesk.icp.community.mobile.stomp.Stomp;
 import com.autodesk.icp.community.mobile.stomp.Subscription;
+import com.autodesk.icp.community.mobile.ui.Item;
+import com.autodesk.icp.community.mobile.ui.ItemListFragment;
 import com.autodesk.icp.community.mobile.util.SessionManager;
+import com.fasterxml.jackson.core.type.TypeReference;
 
-public class MainCommunity extends Activity {
+public class MainCommunity extends BaseActivity {
 
     public static MainCommunity instance = null;
 
@@ -73,13 +82,13 @@ public class MainCommunity extends Activity {
         Display currDisplay = getWindowManager().getDefaultDisplay();
         Point size = new Point();
         currDisplay.getSize(size);
-        int displayWidth = size.x;        
+        int displayWidth = size.x;
         one = displayWidth / 4;
         two = one * 2;
         three = one * 3;
 
         LayoutInflater mLi = LayoutInflater.from(this);
-        View view1 = mLi.inflate(R.layout.main_tab_weixin, null);
+        View view1 = mLi.inflate(R.layout.main_tab_notification, null);
         View view2 = mLi.inflate(R.layout.main_tab_address, null);
         View view3 = mLi.inflate(R.layout.main_tab_friends, null);
         View view4 = mLi.inflate(R.layout.main_tab_settings, null);
@@ -115,7 +124,7 @@ public class MainCommunity extends Activity {
         };
 
         mTabPager.setAdapter(mPagerAdapter);
-        
+
         subscribe();
     }
 
@@ -217,15 +226,15 @@ public class MainCommunity extends Activity {
                 intent.setClass(MainCommunity.this, Exit.class);
                 startActivity(intent);
             }
-        } else if (keyCode == KeyEvent.KEYCODE_MENU) { 
+        } else if (keyCode == KeyEvent.KEYCODE_MENU) {
             if (!menu_display) {
-                
-                inflater = (LayoutInflater)this.getSystemService(LAYOUT_INFLATER_SERVICE);                
+
+                inflater = (LayoutInflater)this.getSystemService(LAYOUT_INFLATER_SERVICE);
                 layout = inflater.inflate(R.layout.main_menu, null);
 
-                menuWindow = new PopupWindow(layout, LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT); 
+                menuWindow = new PopupWindow(layout, LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT);
                 menuWindow.showAtLocation(this.findViewById(R.id.maincommunity), Gravity.BOTTOM
-                                                                                 | Gravity.CENTER_HORIZONTAL, 0, 0); 
+                                                                                 | Gravity.CENTER_HORIZONTAL, 0, 0);
                 mClose = (LinearLayout)layout.findViewById(R.id.menu_close);
                 mCloseBtn = (LinearLayout)layout.findViewById(R.id.menu_close_btn);
 
@@ -236,7 +245,7 @@ public class MainCommunity extends Activity {
                         Intent intent = new Intent();
                         intent.setClass(MainCommunity.this, Exit.class);
                         startActivity(intent);
-                        menuWindow.dismiss(); 
+                        menuWindow.dismiss();
                     }
                 });
                 menu_display = true;
@@ -265,47 +274,61 @@ public class MainCommunity extends Activity {
         startActivity(intent);
     }
 
-    public void btn_shake(View v) { 
+    public void btn_shake(View v) {
         Intent intent = new Intent(MainCommunity.this, ShakeActivity.class);
         startActivity(intent);
     }
-    
-    
+
     private void subscribe() {
         new Thread() {
-            /* (non-Javadoc)
+            /*
+             * (non-Javadoc)
              * @see java.lang.Thread#run()
              */
             @Override
             public void run() {
                 SessionManager sm = new SessionManager(MainCommunity.this);
-                Map<String,String> headersSetup = new HashMap<String,String>();
+                Map<String, String> headersSetup = new HashMap<String, String>();
                 headersSetup.put("Cookie", "JSESSIONID=".concat(sm.getJSESSIONID()));
-                Stomp stomp = new Stomp("ws://10.148.202.55:8080/community/message", headersSetup, new ListenerWSNetwork() {                    
-                    @Override
-                    public void onState(int state) {
-                        // TODO Auto-generated method stub
-                        
-                    }
-                });
-                
-                Map<String,String> connectHeasers = new HashMap<String,String>();
+                Stomp stomp = new Stomp("ws://10.148.202.55:8080/community/message",
+                                        headersSetup,
+                                        new ListenerWSNetwork() {
+                                            @Override
+                                            public void onState(int state) {
+                                                // TODO Auto-generated method stub
+
+                                            }
+                                        });
+
+                Map<String, String> connectHeasers = new HashMap<String, String>();
                 connectHeasers.put("client-id", sm.getUserDetails().getName());
                 stomp.connect(connectHeasers);
-                
-                
-                Map<String,String> subscribeHeasers = new HashMap<String,String>();
+
+                Map<String, String> subscribeHeasers = new HashMap<String, String>();
                 subscribeHeasers.put("activemq.subscriptionName", sm.getUserDetails().getName());
                 stomp.subscribe(new Subscription("/topic/notification", new ListenerSubscription() {
 
                     @Override
-                    public void onMessage(Map<String, String> headers, String body) {
-                        System.out.println(body);
+                    public void onMessage(Map<String, String> headers, final String body) {
+
+                        new Handler(Looper.getMainLooper()).post(new Runnable() {
+
+                            @Override
+                            public void run() {
+                                ItemListFragment lf = (ItemListFragment)getSupportFragmentManager().findFragmentById(R.id.notificationList);
+                                Item item = JSONReadWriteHelper.deSerializeJSON(body, Item.class);
+                                lf.getItems().add(0, item);
+
+                                lf.getAdpater().notifyDataSetChanged();
+
+                            }
+                        });
 
                     }
-                }), subscribeHeasers);
+                }),
+                                subscribeHeasers);
             }
         }.start();
-        
+
     }
 }
