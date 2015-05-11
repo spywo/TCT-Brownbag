@@ -48,6 +48,9 @@ public class MainCommunity extends Activity {
     private boolean menu_display = false;
     private PopupWindow menuWindow;
     private LayoutInflater inflater;
+    private int NewMessage = 1;
+    private Handler mHandler;
+    private NotificationManager mNotificationManager;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -116,6 +119,57 @@ public class MainCommunity extends Activity {
 
         mTabPager.setAdapter(mPagerAdapter);
         
+        //It is used to update UI
+        mHandler = new Handler() {
+
+    		@Override
+    		public void handleMessage(Message msg) {
+    			super.handleMessage(msg);
+    			switch (msg.what) {
+    			case 1:
+    				Bundle data = msg.getData();  
+    	            String body = data.getString("body");
+    	            mNotificationManager = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
+    	            String tickerText = body;
+    	                
+		            Notification notification = new Notification(R.drawable.ic_app_logo, tickerText, System.currentTimeMillis());             
+		            notification.flags = Notification.FLAG_AUTO_CANCEL;                
+		            Intent intent = new Intent(MainCommunity.this, MainCommunity.class);
+		            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP|Intent.FLAG_ACTIVITY_NEW_TASK); 
+		            //This body will be passed to MainCommunity
+		            intent.putExtra("body", body);
+		            PendingIntent contentIntent = PendingIntent.getActivity(
+		            		MainCommunity.this, 
+		                    R.string.app_name, 
+		                    intent, 
+		                    PendingIntent.FLAG_UPDATE_CURRENT);
+    	                        
+    	              
+		            notification.setLatestEventInfo(
+    	            		 MainCommunity.this,
+    	                     body, 
+    	                     body, 
+    	                     contentIntent);
+    	            mNotificationManager.notify(R.string.app_name, n);
+    				break;
+    			default:
+    				break;
+    			}
+    		}
+
+    	};
+    	
+    	try{
+    	Intent intentData = getIntent();
+    	String ret = intentData.getStringExtra("body");
+    	if(!ret.isEmpty()){
+    		//update the UI
+    		;
+    	}
+    	}catch(Exception e){
+    		e.printStackTrace();
+    	}
+    	
         subscribe();
     }
 
@@ -300,7 +354,15 @@ public class MainCommunity extends Activity {
 
                     @Override
                     public void onMessage(Map<String, String> headers, String body) {
-                        System.out.println(body);
+                    	Message msg = new Message();       
+                        msg.what = NewMessage;  
+                        //pass data getten from server to handler  
+                        Bundle data = new Bundle();  
+                        data.putString("body", body);
+                        msg.setData(data);  
+                          
+                        mHandler.sendMessage(msg); // send message to handler to update UI 
+                    	//System.out.println(body);
 
                     }
                 }), subscribeHeasers);

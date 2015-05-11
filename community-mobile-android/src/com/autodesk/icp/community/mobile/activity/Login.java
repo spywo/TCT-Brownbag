@@ -25,6 +25,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 public class Login extends BaseActivity {
     private EditText mUser;
     private EditText mPassword;
+    private ProgressDialog dialog; 
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -37,6 +38,9 @@ public class Login extends BaseActivity {
     }
 
     public void login(View v) {
+    	//new de progress dialog
+        dialog = ProgressDialog.show(this, "", "Logining..."); 
+        
         if (!verifyUsername() || !verifyPassword()) {
             return;
         }
@@ -48,6 +52,7 @@ public class Login extends BaseActivity {
                         Intent intent = new Intent(Login.this, MainCommunity.class);
                         startActivity(intent);
                         Login.this.finish();
+                        dialog.dismiss(); 
                     }
                 }
             };
