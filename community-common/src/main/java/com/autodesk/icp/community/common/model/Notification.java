@@ -20,15 +20,51 @@
 // Software Restricted Rights) and DFAR 252.227-7013(c)(1)(ii)
 // (Rights in Technical Data and Computer Software), as applicable.
 //
-package com.autodesk.icp.community.common.util;
+package com.autodesk.icp.community.common.model;
+
 
 /**
  * @author Oliver Wu
+ *
  */
-public class Consts {
-    public final static String USERNAME = "username";
-    public final static String PASSWORD = "password";
-    
-    public final static String SESSION_ATTR_SESSION = "CURRENT_HTTP_SESSION";
-    public final static String SESSION_ATTR_USER = "HTTP_SESSION_USER";
+public class Notification {
+    private String title;
+    private String description;
+    private String timestamp;
+    /**
+     * @return the title
+     */
+    public String getTitle() {
+        return title;
+    }
+    /**
+     * @param title the title to set
+     */
+    public void setTitle(String title) {
+        this.title = title;
+    }
+    /**
+     * @return the description
+     */
+    public String getDescription() {
+        return description;
+    }
+    /**
+     * @param description the description to set
+     */
+    public void setDescription(String description) {
+        this.description = description;
+    }
+    /**
+     * @return the timestamp
+     */
+    public String getTimestamp() {
+        return timestamp;
+    }
+    /**
+     * @param timestamp the timestamp to set
+     */
+    public void setTimestamp(String timestamp) {
+        this.timestamp = timestamp;
+    }
 }

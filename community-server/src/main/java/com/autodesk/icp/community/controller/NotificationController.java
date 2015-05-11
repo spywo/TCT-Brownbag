@@ -22,10 +22,14 @@
 //
 package com.autodesk.icp.community.controller;
 
+import java.util.Date;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+
+import com.autodesk.icp.community.common.model.Notification;
 
 /**
  * @author Oliver Wu
@@ -37,6 +41,10 @@ public class NotificationController {
   
     @RequestMapping("/sendmessage")
     public void message() {
-        template.convertAndSend("/topic/notification", "{\"name\":\"dummy\", \"body\":\"HelloWorld\"}");
+        Notification notification = new Notification();
+        notification.setTitle("Dummy");
+        notification.setDescription("HelloWorld");
+        notification.setTimestamp(new Date().toString());
+        template.convertAndSend("/topic/notification", notification);
     }
 }

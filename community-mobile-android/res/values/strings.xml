@@ -13,7 +13,10 @@
     <string name="label_username_invalid_empty">Username cannot be empty.</string>
     <string name="label_password_invalid_empty">Password cannot be empty.</string>
     <string name="label_password_invalid_incorrect">Password may not be correct.</string>
+    <string name="label_up_invalid_incorrect">Username or password incorrect.</string>
     <string name="label_loading">Loading...</string>
+    
+    <string name="label_subscribe">Subscribe</string>
         
     <string name="action_settings">Settings</string>
 

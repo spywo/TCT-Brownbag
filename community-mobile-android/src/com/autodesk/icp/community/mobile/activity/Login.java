@@ -10,15 +10,20 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 import android.app.AlertDialog;
+import android.app.DialogFragment;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.autodesk.icp.community.common.model.ServiceResponse;
+import com.autodesk.icp.community.common.model.ServiceStatus;
 import com.autodesk.icp.community.common.model.User;
+import com.autodesk.icp.community.common.util.Consts;
 import com.autodesk.icp.community.mobile.util.SessionManager;
 import com.fasterxml.jackson.core.type.TypeReference;
 
@@ -33,7 +38,6 @@ public class Login extends BaseActivity {
 
         mUser = (EditText)findViewById(R.id.login_user_edit);
         mPassword = (EditText)findViewById(R.id.login_passwd_edit);
-
     }
 
     public void login(View v) {
@@ -41,30 +45,49 @@ public class Login extends BaseActivity {
             return;
         }
 
-        if ("test".equals(mUser.getText().toString()) && "123".equals(mPassword.getText().toString())) {
-            final Handler myHandler = new Handler() {
-                public void handleMessage(Message msg) {
-                    if (msg.getData().getBoolean("flag")) {
+        final DialogFragment loadingDialog = showLoadingDialog();
+
+        final Handler myHandler = new Handler() {
+            public void handleMessage(Message msg) {
+                switch (msg.what) {
+                    case 0: // success
                         Intent intent = new Intent(Login.this, MainCommunity.class);
                         startActivity(intent);
-                        Login.this.finish();
-                    }
-                }
-            };
 
-            new Thread() {
-                public void run() {
-                    
-                    authenticate(mUser.getText().toString(), mPassword.getText().toString());
-                    Message msg = myHandler.obtainMessage();
-                    Bundle b = new Bundle();
-                    b.putBoolean("flag", true);
-                    msg.setData(b);
-                    myHandler.sendMessage(msg);
+                        Login.this.finish();
+                        break;
+                    case 1: // failure
+                        Toast toast = Toast.makeText(Login.this,
+                                                     getResources().getString(R.string.label_up_invalid_incorrect),
+                                                     Toast.LENGTH_LONG);
+                        toast.setGravity(Gravity.CENTER, 0, 0);
+                        toast.show();
+
+                        mPassword.requestFocus();
+                        
+                        dismissWaitingDialog(loadingDialog);
+                        break;
+
+                    default:
+                        break;
                 }
-            }.start();
-               
-        }
+            }
+        };
+
+        new Thread() {
+            public void run() {
+
+                boolean isLoggedIn = authenticate(mUser.getText().toString(), mPassword.getText().toString());
+                Message msg = myHandler.obtainMessage();
+                if (isLoggedIn) {
+                    msg.what = 0;
+                } else {
+                    msg.what = 1;
+                }
+                myHandler.sendMessage(msg);
+            }
+        }.start();
+
     }
 
     public void login_back(View v) {
@@ -98,24 +121,28 @@ public class Login extends BaseActivity {
     private boolean authenticate(String username, String password) {
         String url = "http://10.148.202.55:8080/community/login";
 
+        MappingJackson2HttpMessageConverter jsonConverter = new MappingJackson2HttpMessageConverter();
         RestTemplate restTemplate = new RestTemplate();
-        restTemplate.setMessageConverters(Arrays.asList(new FormHttpMessageConverter(),
-                                                        new MappingJackson2HttpMessageConverter()));
+        restTemplate.setMessageConverters(Arrays.asList(new FormHttpMessageConverter(), jsonConverter));
 
         MultiValueMap<String, String> postbody = new LinkedMultiValueMap<String, String>();
-        postbody.add("username", username);
-        postbody.add("password", password);
+        postbody.add(Consts.USERNAME, username);
+        postbody.add(Consts.PASSWORD, password);
 
         ResponseEntity<Object> result = restTemplate.postForEntity(url, postbody, Object.class);
-        ServiceResponse<User> response = new MappingJackson2HttpMessageConverter().getObjectMapper()
-                                                                                  .convertValue(result.getBody(),
-                                                                                                new TypeReference<ServiceResponse<User>>() {
-                                                                                                });
+        ServiceResponse<User> response = jsonConverter.getObjectMapper()
+                                                      .convertValue(result.getBody(),
+                                                                    new TypeReference<ServiceResponse<User>>() {
+                                                                    });
 
-        SessionManager sm = new SessionManager(this);
-        sm.createLoginSession(response.getPayload());
-        sm.setJSESSIONID(getJSESSIONID(result));
-        return true;
+        if (ServiceStatus.OK.equals(response.getStatus())) {
+            SessionManager sm = new SessionManager(this);
+            sm.createLoginSession(response.getPayload());
+            sm.setJSESSIONID(getJSESSIONID(result));
+            return true;
+        } else {
+            return false;
+        }
     }
 
     private String getJSESSIONID(ResponseEntity<?> entity) {
