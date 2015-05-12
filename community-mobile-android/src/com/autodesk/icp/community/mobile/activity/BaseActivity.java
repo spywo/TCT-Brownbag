@@ -22,16 +22,19 @@
 //
 package com.autodesk.icp.community.mobile.activity;
 
+import android.app.Activity;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.app.FragmentTransaction;
 import android.os.Bundle;
-import android.support.v4.app.FragmentActivity;
+
+import com.autodesk.icp.community.mobile.util.ConfigurationManager;
+import com.autodesk.icp.community.mobile.util.SessionManager;
 
 /**
  * @author Oliver Wu
  */
-public class BaseActivity extends FragmentActivity {
+public class BaseActivity extends Activity {
 
     protected DialogFragment showLoadingDialog() {
         FragmentTransaction ft = getFragmentManager().beginTransaction();
@@ -49,14 +52,22 @@ public class BaseActivity extends FragmentActivity {
             dialog.dismiss();
         }
     }
-
+    
+    protected ConfigurationManager getConfigurationManager() {
+        return new ConfigurationManager(this);
+    }
+    
+    protected SessionManager getSessionManager() {
+        return new SessionManager(this);
+    }
+    
     private class LoadingDialog extends DialogFragment {
         @Override
         public Dialog onCreateDialog(Bundle savedInstanceState) {
             Dialog dialog = new Dialog(BaseActivity.this, R.style.loading_circle_progress);
             dialog.setContentView(R.layout.loading);
-            dialog.setCancelable(false);
-
+            dialog.setCancelable(false);          
+            
             return dialog;
         }
     }

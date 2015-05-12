@@ -2,8 +2,8 @@ package com.autodesk.icp.community.mobile.ui;
 
 import java.util.ArrayList;
 
+import android.app.ListFragment;
 import android.os.Bundle;
-import android.support.v4.app.ListFragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;

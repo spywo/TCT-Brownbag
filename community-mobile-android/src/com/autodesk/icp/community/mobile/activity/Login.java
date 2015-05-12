@@ -2,11 +2,13 @@ package com.autodesk.icp.community.mobile.activity;
 
 import java.util.Arrays;
 
+import org.apache.commons.lang.StringUtils;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.FormHttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 import android.app.AlertDialog;
@@ -38,6 +40,21 @@ public class Login extends BaseActivity {
 
         mUser = (EditText)findViewById(R.id.login_user_edit);
         mPassword = (EditText)findViewById(R.id.login_passwd_edit);
+
+        if (isLoggedIn()) {
+            User cachedUser = getSessionManager().getUserDetails();
+            if (cachedUser != null) {
+                String loginId = cachedUser.getLoginId();
+                String password = cachedUser.getPassword();
+
+                mUser.setText(loginId);
+                mPassword.setText(password);
+                
+                if (StringUtils.isNotBlank(loginId) && StringUtils.isNotBlank(password)) {
+                    login(null);
+                }
+            }
+        }
     }
 
     public void login(View v) {
@@ -58,16 +75,25 @@ public class Login extends BaseActivity {
                         break;
                     case 1: // failure
                         Toast toast = Toast.makeText(Login.this,
-                                                     getResources().getString(R.string.label_up_invalid_incorrect),
+                                                     getResources().getString(R.string.warning_up_invalid_incorrect),
                                                      Toast.LENGTH_LONG);
                         toast.setGravity(Gravity.CENTER, 0, 0);
                         toast.show();
 
                         mPassword.requestFocus();
-                        
+
                         dismissWaitingDialog(loadingDialog);
                         break;
+                    case 2:
+                        Toast connectionWarning = Toast.makeText(Login.this,
+                                                     getResources().getString(R.string.warning_connection_issue),
+                                                     Toast.LENGTH_LONG);
+                        connectionWarning.setGravity(Gravity.CENTER, 0, 0);
+                        connectionWarning.show();
+                        
+                        mPassword.requestFocus();
 
+                        dismissWaitingDialog(loadingDialog);
                     default:
                         break;
                 }
@@ -76,13 +102,16 @@ public class Login extends BaseActivity {
 
         new Thread() {
             public void run() {
-
-                boolean isLoggedIn = authenticate(mUser.getText().toString(), mPassword.getText().toString());
                 Message msg = myHandler.obtainMessage();
-                if (isLoggedIn) {
-                    msg.what = 0;
-                } else {
-                    msg.what = 1;
+                try {
+                    boolean isLoggedIn = authenticate(mUser.getText().toString(), mPassword.getText().toString());
+                    if (isLoggedIn) {
+                        msg.what = 0;
+                    } else {
+                        msg.what = 1;
+                    }
+                } catch (RestClientException e) {
+                    msg.what = 2;
                 }
                 myHandler.sendMessage(msg);
             }
@@ -98,7 +127,7 @@ public class Login extends BaseActivity {
         if (mUser.getText().toString().isEmpty()) {
             new AlertDialog.Builder(Login.this).setIcon(getResources().getDrawable(R.drawable.login_error_icon))
                                                .setTitle(getResources().getString(R.string.label_warning))
-                                               .setMessage(getResources().getString(R.string.label_username_invalid_empty))
+                                               .setMessage(getResources().getString(R.string.warning_username_invalid_empty))
                                                .create()
                                                .show();
             return false;
@@ -110,7 +139,7 @@ public class Login extends BaseActivity {
         if (mPassword.getText().toString().isEmpty()) {
             new AlertDialog.Builder(Login.this).setIcon(getResources().getDrawable(R.drawable.login_error_icon))
                                                .setTitle(getResources().getString(R.string.label_warning))
-                                               .setMessage(getResources().getString(R.string.label_password_invalid_empty))
+                                               .setMessage(getResources().getString(R.string.warning_password_invalid_empty))
                                                .create()
                                                .show();
             return false;
@@ -118,8 +147,8 @@ public class Login extends BaseActivity {
         return true;
     }
 
-    private boolean authenticate(String username, String password) {
-        String url = "http://10.148.202.55:8080/community/login";
+    private boolean authenticate(String username, String password) {        
+        String url = getConfigurationManager().getProperties("server.uri.http") + "/login";
 
         MappingJackson2HttpMessageConverter jsonConverter = new MappingJackson2HttpMessageConverter();
         RestTemplate restTemplate = new RestTemplate();
@@ -129,18 +158,25 @@ public class Login extends BaseActivity {
         postbody.add(Consts.USERNAME, username);
         postbody.add(Consts.PASSWORD, password);
 
-        ResponseEntity<Object> result = restTemplate.postForEntity(url, postbody, Object.class);
-        ServiceResponse<User> response = jsonConverter.getObjectMapper()
-                                                      .convertValue(result.getBody(),
-                                                                    new TypeReference<ServiceResponse<User>>() {
-                                                                    });
-
-        if (ServiceStatus.OK.equals(response.getStatus())) {
-            SessionManager sm = new SessionManager(this);
-            sm.createLoginSession(response.getPayload());
-            sm.setJSESSIONID(getJSESSIONID(result));
-            return true;
-        } else {
+        try {
+            ResponseEntity<Object> result = restTemplate.postForEntity(url, postbody, Object.class);
+            ServiceResponse<User> response = jsonConverter.getObjectMapper()
+                                                          .convertValue(result.getBody(),
+                                                                        new TypeReference<ServiceResponse<User>>() {
+                                                                        });
+            if (ServiceStatus.OK.equals(response.getStatus())) {
+                SessionManager sm = getSessionManager();
+                User user = response.getPayload();
+                user.setPassword(password);
+                sm.createLoginSession(user);
+                sm.setJSESSIONID(getJSESSIONID(result));
+                return true;
+            } else {
+                return false;
+            }
+        } catch (RestClientException e) {
+            throw e;
+        } catch (Exception e) {        
             return false;
         }
     }
@@ -156,5 +192,9 @@ public class Login extends BaseActivity {
             }
         }
         return null;
+    }
+
+    private boolean isLoggedIn() {
+        return getSessionManager().isLoggedIn();
     }
 }
