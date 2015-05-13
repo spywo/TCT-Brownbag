@@ -2,29 +2,44 @@ package com.autodesk.icp.community.mobile.activity;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Point;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.os.Message;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
+import android.view.ContextMenu;
 import android.view.Display;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnCreateContextMenuListener;
 import android.view.WindowManager;
 import android.view.WindowManager.LayoutParams;
 import android.view.animation.Animation;
 import android.view.animation.TranslateAnimation;
+import android.widget.AdapterView;
+import android.widget.AdapterView.AdapterContextMenuInfo;
+import android.widget.AdapterView.OnItemClickListener;
+import android.widget.AdapterView.OnItemLongClickListener;
+import android.widget.AdapterView.OnItemSelectedListener;
+import android.view.ContextMenu.ContextMenuInfo;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.PopupWindow;
 
 import com.autodesk.icp.community.common.model.ServiceResponse;
@@ -37,6 +52,8 @@ import com.autodesk.icp.community.mobile.stomp.Subscription;
 import com.autodesk.icp.community.mobile.ui.Item;
 import com.autodesk.icp.community.mobile.ui.ItemListFragment;
 import com.autodesk.icp.community.mobile.util.SessionManager;
+import com.autodesk.icp.community.mobile.util.DataDefine;
+import com.autodesk.icp.community.mobile.activity.ListviewAdapter;
 import com.fasterxml.jackson.core.type.TypeReference;
 
 public class MainCommunity extends BaseActivity {
@@ -57,6 +74,12 @@ public class MainCommunity extends BaseActivity {
     private boolean menu_display = false;
     private PopupWindow menuWindow;
     private LayoutInflater inflater;
+    private int NewMessage = 1;
+    private Handler mHandler;
+    private NotificationManager mNotificationManager;
+    private List<Map<String, Object>> mData;
+    private View view1 = null;
+    ListviewAdapter adapter = null;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -88,7 +111,7 @@ public class MainCommunity extends BaseActivity {
         three = one * 3;
 
         LayoutInflater mLi = LayoutInflater.from(this);
-        View view1 = mLi.inflate(R.layout.main_tab_notification, null);
+        view1 = mLi.inflate(R.layout.main_tab_notification, null);
         View view2 = mLi.inflate(R.layout.main_tab_address, null);
         View view3 = mLi.inflate(R.layout.main_tab_friends, null);
         View view4 = mLi.inflate(R.layout.main_tab_settings, null);
@@ -124,8 +147,83 @@ public class MainCommunity extends BaseActivity {
         };
 
         mTabPager.setAdapter(mPagerAdapter);
+        
+        //It is used to update UI
+        mHandler = new Handler() {
 
+    		@Override
+    		public void handleMessage(Message msg) {
+    			super.handleMessage(msg);
+    			switch (msg.what) {
+    			case 1:
+    				Bundle data = msg.getData();  
+    	            String body = data.getString("body");
+    	            mNotificationManager = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
+    	            String tickerText = body;
+    	                
+		            Notification notification = new Notification(R.drawable.ic_app_logo, tickerText, System.currentTimeMillis());             
+		            notification.flags = Notification.FLAG_AUTO_CANCEL;                
+		            Intent intent = new Intent(MainCommunity.this, MainCommunity.class);
+		            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP|Intent.FLAG_ACTIVITY_NEW_TASK); 
+		            //This body will be passed to MainCommunity
+		            intent.putExtra("body", body);
+		            PendingIntent contentIntent = PendingIntent.getActivity(
+		            		MainCommunity.this, 
+		                    R.string.app_name, 
+		                    intent, 
+		                    PendingIntent.FLAG_UPDATE_CURRENT);    	                         
+    	              
+		            notification.setLatestEventInfo(
+    	            		 MainCommunity.this,
+    	                     body, 
+    	                     body, 
+    	                     contentIntent);
+    	            mNotificationManager.notify(R.string.app_name, notification);
+    				break;
+    			default:
+    				break;
+    			}
+    		}
+
+    	};
+    	
+    	try{
+    	Intent intentData = getIntent();
+    	String ret = intentData.getStringExtra("body");
+    	if(!ret.isEmpty()){
+    		//update the UI
+    		;
+    	}
+    	}catch(Exception e){
+    		e.printStackTrace();
+    	}
+    	
         subscribe();
+        
+        mData = new ArrayList<Map<String, Object>>();
+        initListView01Event();
+    }
+    
+	@Override
+    public void onResume(){
+    	super.onResume();
+    	refreshDatatoView();
+    	
+    	try{
+    	Intent intentData = getIntent();
+    	String ret = intentData.getStringExtra("body");
+    	if(!ret.isEmpty()){
+    	        
+    	        Map<String, Object> map = new HashMap<String, Object>();
+				map.put(DataDefine.NUMBER, 1); 
+		        map.put(DataDefine.MATERIALNAME, ret); 
+		        map.put(DataDefine.MATERIALQUANTITY, 1); 
+		        mData.add(map);
+		        adapter.notifyDataSetChanged();
+    	}
+    	}catch(Exception e){
+    		e.printStackTrace();
+    	}
     }
 
     public class MyOnClickListener implements View.OnClickListener {
@@ -134,7 +232,7 @@ public class MainCommunity extends BaseActivity {
         public MyOnClickListener(int i) {
             index = i;
         }
-
+        
         @Override
         public void onClick(View v) {
             mTabPager.setCurrentItem(index);
@@ -286,7 +384,7 @@ public class MainCommunity extends BaseActivity {
                 SessionManager sm = new SessionManager(MainCommunity.this);
                 Map<String, String> headersSetup = new HashMap<String, String>();
                 headersSetup.put("Cookie", "JSESSIONID=".concat(sm.getJSESSIONID()));
-                Stomp stomp = new Stomp("ws://10.148.202.55:8080/community/message",
+                Stomp stomp = new Stomp("ws://10.148.206.109:8080/community/message",
                                         headersSetup,
                                         new ListenerWSNetwork() {
                                             @Override
@@ -305,26 +403,150 @@ public class MainCommunity extends BaseActivity {
                 stomp.subscribe(new Subscription("/topic/notification", new ListenerSubscription() {
 
                     @Override
-                    public void onMessage(Map<String, String> headers, final String body) {
-
-                        new Handler(Looper.getMainLooper()).post(new Runnable() {
-
-                            @Override
-                            public void run() {
-                                ItemListFragment lf = (ItemListFragment)getSupportFragmentManager().findFragmentById(R.id.notificationList);
-                                Item item = JSONReadWriteHelper.deSerializeJSON(body, Item.class);
-                                lf.getItems().add(0, item);
-
-                                lf.getAdpater().notifyDataSetChanged();
-
-                            }
-                        });
-
+                    public void onMessage(Map<String, String> headers, String body) {
+                    	Message msg = new Message();       
+                        msg.what = NewMessage;  
+                        //pass data getten from server to handler  
+                        Bundle data = new Bundle();  
+                        data.putString("body", body);
+                        msg.setData(data);  
+                          
+                        mHandler.sendMessage(msg); // send message to handler to update UI 
+                    	//System.out.println(body);
+                   
                     }
                 }),
                                 subscribeHeasers);
             }
         }.start();
 
+    }
+    
+    private void refreshDatatoView(){
+    	ListView lview = null;
+    	try{
+    	lview = (ListView)view1.findViewById(R.id.listView); //(ListView) findViewById(R.id.listView);
+        }catch(Exception e){
+        	e.printStackTrace();
+        }
+        getData(mData);
+        adapter = new ListviewAdapter(this, mData);
+        lview.setAdapter(adapter);
+    }
+    
+    private List<Map<String, Object>> getData(final List<Map<String, Object>> list) {
+
+        //final List<Map<String, Object>> list = 
+        Map<String, Object> titleMap = new HashMap<String, Object>();
+        titleMap.put(DataDefine.NUMBER, "a"); //this.getString(R.string.material_list_id));
+        titleMap.put(DataDefine.MATERIALNAME, "b"); //this.getString(R.string.material_list_name));
+        titleMap.put(DataDefine.MATERIALQUANTITY, "c"); //this.getString(R.string.material_list_quantity));
+        list.add(titleMap);
+        
+        
+        Thread t = new Thread( new Runnable() {
+			public void run() {
+				//WebServiceMaterialProxy materialProxy = new WebServiceMaterialProxy();
+
+				try {
+					//comment out the following statement to test other webservice
+					//userProxy.logoff("67");
+					//comment out the following statement to test other webservice
+					//User appUser = (User)getApplication();
+					//JSONArray array = materialProxy.getMaterialList(appUser.getUserId(), 1, 20);
+					//JSONArray projectList = materialProxy.getMaterialList(appUser.getUserId(), 1, 20);
+					
+					//int count = array.length();
+					int count = 1;
+					for(int i = 0; i< count; ++i){
+				        Map<String, Object> map = new HashMap<String, Object>();
+						map.put(DataDefine.NUMBER, i); //array.getJSONObject(i).getString(DataDefine.MATERIALIDINSERVER));
+				        map.put(DataDefine.MATERIALNAME, i+1); //array.getJSONObject(i).getString(DataDefine.MATERIALNAMEINSERVER));
+				        map.put(DataDefine.MATERIALQUANTITY, i+2); //array.getJSONObject(i).getString(DataDefine.MATERIALQUANTITYINSERVER));
+				        list.add(map);
+					}
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} 
+				
+			}
+			});
+        t.start();
+        try {
+			t.join();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+         
+        return list;
+    }
+    
+
+    public void initListView01Event(){  
+    	ListView lview = null;
+    	try{
+    	lview = (ListView)view1.findViewById(R.id.listView); //(ListView) findViewById(R.id.listView);
+        }catch(Exception e){
+        	e.printStackTrace();
+        }
+        //ListView的item点击事件  
+    	lview.setOnItemClickListener(new OnItemClickListener(){  
+  
+            public void onItemClick(AdapterView<?> parent, View view,  
+                    int position, long id) {  
+        	    ListView listView = (ListView)parent;  
+        	    HashMap<String, String> map = (HashMap<String, String>) listView.getItemAtPosition(position);  
+        	    //need to improve
+        	    Intent intent =new Intent(MainCommunity.this,null);
+            	
+            	Bundle bundle =new Bundle();
+                bundle.putString(DataDefine.NUMBER, map.get(DataDefine.NUMBER));
+                bundle.putString(DataDefine.MATERIALNAME, map.get(DataDefine.MATERIALNAME));
+                bundle.putString(DataDefine.MATERIALQUANTITY, map.get(DataDefine.MATERIALQUANTITY)); 
+                bundle.putString("ACTION", "check");
+                intent.putExtras(bundle);
+                startActivityForResult(intent, 100);
+            }  
+        });  
+          
+    	lview.setOnItemLongClickListener(new OnItemLongClickListener(){  
+  
+            public boolean onItemLongClick(AdapterView<?> parent, View view,  
+                    int position, long id) {  
+
+            	int a = 0;
+            	a =1;
+                return false;  
+            }  
+              
+        });  
+          
+
+    	lview.setOnItemSelectedListener(new OnItemSelectedListener(){  
+
+            public void onItemSelected(AdapterView<?> parent, View view,  
+                    int position, long id) {  
+
+            }  
+  
+            public void onNothingSelected(AdapterView<?> parent) {  
+
+            }  
+              
+        });  
+         
+    	
+        lview.setOnCreateContextMenuListener(new OnCreateContextMenuListener(){
+        	
+            public void onCreateContextMenu(ContextMenu menu, View v,  
+                    ContextMenuInfo menuInfo) {  
+
+                AdapterContextMenuInfo info = (AdapterContextMenuInfo) menuInfo;  
+                int position = info.position;  
+                  
+            }
+        });
     }
 }

@@ -52,11 +52,19 @@
         </EditText>
     </LinearLayout>
 
-    <fragment
-        android:id="@+id/notificationList"
-        android:name="com.autodesk.icp.community.mobile.ui.ItemListFragment"
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_weight="1" />
+        android:layout_height="60dp"
+        android:background="@drawable/mm_listitem"
+        android:clickable="true"
+        android:gravity="center_vertical"
+        android:onClick="startchat" >
+     <ListView
+        android:id="@+id/listView"
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent">
+    </ListView>
+        
+    </RelativeLayout>
 
 </LinearLayout>

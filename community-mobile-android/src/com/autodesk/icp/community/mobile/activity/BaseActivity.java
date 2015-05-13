@@ -56,7 +56,7 @@ public class BaseActivity extends FragmentActivity {
             Dialog dialog = new Dialog(BaseActivity.this, R.style.loading_circle_progress);
             dialog.setContentView(R.layout.loading);
             dialog.setCancelable(false);
-
+        	
             return dialog;
         }
     }

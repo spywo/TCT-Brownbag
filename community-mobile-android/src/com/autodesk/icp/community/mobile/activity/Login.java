@@ -11,6 +11,7 @@ import org.springframework.web.client.RestTemplate;
 
 import android.app.AlertDialog;
 import android.app.DialogFragment;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -30,6 +31,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 public class Login extends BaseActivity {
     private EditText mUser;
     private EditText mPassword;
+    //private ProgressDialog dialog; 
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -41,6 +43,9 @@ public class Login extends BaseActivity {
     }
 
     public void login(View v) {
+    	//new de progress dialog
+        //dialog = ProgressDialog.show(this, "", "Logining..."); 
+        
         if (!verifyUsername() || !verifyPassword()) {
             return;
         }
@@ -55,6 +60,8 @@ public class Login extends BaseActivity {
                         startActivity(intent);
 
                         Login.this.finish();
+                        
+                        //dialog.dismiss(); 
                         break;
                     case 1: // failure
                         Toast toast = Toast.makeText(Login.this,
@@ -119,7 +126,7 @@ public class Login extends BaseActivity {
     }
 
     private boolean authenticate(String username, String password) {
-        String url = "http://10.148.202.55:8080/community/login";
+        String url = "http://10.148.206.109:8080/community/login";
 
         MappingJackson2HttpMessageConverter jsonConverter = new MappingJackson2HttpMessageConverter();
         RestTemplate restTemplate = new RestTemplate();

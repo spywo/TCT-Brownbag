@@ -9,7 +9,7 @@ public class LoadingActivity extends Activity {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+/*        super.onCreate(savedInstanceState);
         setContentView(R.layout.loading);
 
         new Handler().postDelayed(new Runnable() {
@@ -19,6 +19,6 @@ public class LoadingActivity extends Activity {
                 startActivity(intent);
                 LoadingActivity.this.finish();                
             }
-        }, 200);
+        }, 200);*/
     }
 }
