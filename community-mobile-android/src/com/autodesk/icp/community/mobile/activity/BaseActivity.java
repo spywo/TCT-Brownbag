@@ -22,38 +22,42 @@
 //
 package com.autodesk.icp.community.mobile.activity;
 
-
-import android.app.Activity;
-import android.graphics.Color;
-import android.view.Gravity;
-import android.view.View;
-import android.widget.LinearLayout;
-import android.widget.LinearLayout.LayoutParams;
-import android.widget.ProgressBar;
-import android.widget.TextView;
+import android.app.Dialog;
+import android.app.DialogFragment;
+import android.app.FragmentTransaction;
+import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
 
 /**
  * @author Oliver Wu
  */
-public class BaseActivity extends Activity {
+public class BaseActivity extends FragmentActivity {
 
-    protected void createProgressBar() {
-        LinearLayout mProgressLayout = new LinearLayout(this);
-        mProgressLayout.setMinimumHeight(30);
-        mProgressLayout.setGravity(Gravity.CENTER);
-        mProgressLayout.setOrientation(LinearLayout.HORIZONTAL);
-        LayoutParams mLayoutParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT,
-                                                                   LinearLayout.LayoutParams.WRAP_CONTENT);
-        ProgressBar mProgressBar = new ProgressBar(this);
-        mProgressBar.setPadding(100, 250, 5, 80);
-        mProgressLayout.addView(mProgressBar, mLayoutParams);
-        TextView mContent = new TextView(this);
-        mContent.setText("Loading...");
-        mContent.setTextSize(19);
-        mContent.setTextColor(Color.BLACK);
-        mContent.setPadding(0, 250, 0, 80);
-        mProgressLayout.addView(mContent, mLayoutParams);
-        mProgressLayout.setVisibility(View.VISIBLE);
-        this.addContentView(mProgressLayout, mLayoutParams);
+    protected DialogFragment showLoadingDialog() {
+        FragmentTransaction ft = getFragmentManager().beginTransaction();
+        DialogFragment loadingFragment = new LoadingDialog();
+        Bundle args = new Bundle();
+        loadingFragment.setArguments(args);
+
+        loadingFragment.show(ft, "loading dialog");
+        
+        return loadingFragment;
+    }
+
+    protected void dismissWaitingDialog(DialogFragment dialog) {
+        if (dialog != null) {
+            dialog.dismiss();
+        }
+    }
+
+    private class LoadingDialog extends DialogFragment {
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+            Dialog dialog = new Dialog(BaseActivity.this, R.style.loading_circle_progress);
+            dialog.setContentView(R.layout.loading);
+            dialog.setCancelable(false);
+        	
+            return dialog;
+        }
     }
 }

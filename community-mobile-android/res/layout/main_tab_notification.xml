@@ -16,7 +16,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
-            android:text="微信"
+            android:text="@string/label_subscribe"
             android:textColor="#ffffff"
             android:textSize="20sp" />
 
@@ -59,40 +59,12 @@
         android:clickable="true"
         android:gravity="center_vertical"
         android:onClick="startchat" >
-
-        <ImageView
-            android:id="@+id/head"
-            android:layout_width="55dp"
-            android:layout_height="55dp"
-            android:layout_alignParentLeft="true"
-            android:layout_centerVertical="true"
-            android:paddingLeft="5dp"
-            android:src="@drawable/xiaohei" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_toRightOf="@id/head"
-            android:padding="7dp"
-            android:text="小黑"
-            android:textColor="#000" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:padding="7dp"
-            android:text="昨天 晚上"
-            android:textColor="#666" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_toRightOf="@id/head"
-            android:padding="7dp"
-            android:text="尼滚...."
-            android:textColor="#666" />
+     <ListView
+        android:id="@+id/listView"
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent">
+    </ListView>
+        
     </RelativeLayout>
 
 </LinearLayout>

@@ -2,35 +2,61 @@ package com.autodesk.icp.community.mobile.activity;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
-import android.app.Activity;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Point;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
+import android.view.ContextMenu;
 import android.view.Display;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnCreateContextMenuListener;
 import android.view.WindowManager;
 import android.view.WindowManager.LayoutParams;
 import android.view.animation.Animation;
 import android.view.animation.TranslateAnimation;
+import android.widget.AdapterView;
+import android.widget.AdapterView.AdapterContextMenuInfo;
+import android.widget.AdapterView.OnItemClickListener;
+import android.widget.AdapterView.OnItemLongClickListener;
+import android.widget.AdapterView.OnItemSelectedListener;
+import android.view.ContextMenu.ContextMenuInfo;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.PopupWindow;
 
+import com.autodesk.icp.community.common.model.ServiceResponse;
+import com.autodesk.icp.community.common.model.User;
+import com.autodesk.icp.community.common.util.JSONReadWriteHelper;
 import com.autodesk.icp.community.mobile.stomp.ListenerSubscription;
 import com.autodesk.icp.community.mobile.stomp.ListenerWSNetwork;
 import com.autodesk.icp.community.mobile.stomp.Stomp;
 import com.autodesk.icp.community.mobile.stomp.Subscription;
+import com.autodesk.icp.community.mobile.ui.Item;
+import com.autodesk.icp.community.mobile.ui.ItemListFragment;
 import com.autodesk.icp.community.mobile.util.SessionManager;
+import com.autodesk.icp.community.mobile.util.DataDefine;
+import com.autodesk.icp.community.mobile.activity.ListviewAdapter;
+import com.fasterxml.jackson.core.type.TypeReference;
 
-public class MainCommunity extends Activity {
+public class MainCommunity extends BaseActivity {
 
     public static MainCommunity instance = null;
 
@@ -51,6 +77,9 @@ public class MainCommunity extends Activity {
     private int NewMessage = 1;
     private Handler mHandler;
     private NotificationManager mNotificationManager;
+    private List<Map<String, Object>> mData;
+    private View view1 = null;
+    ListviewAdapter adapter = null;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -76,13 +105,13 @@ public class MainCommunity extends Activity {
         Display currDisplay = getWindowManager().getDefaultDisplay();
         Point size = new Point();
         currDisplay.getSize(size);
-        int displayWidth = size.x;        
+        int displayWidth = size.x;
         one = displayWidth / 4;
         two = one * 2;
         three = one * 3;
 
         LayoutInflater mLi = LayoutInflater.from(this);
-        View view1 = mLi.inflate(R.layout.main_tab_weixin, null);
+        view1 = mLi.inflate(R.layout.main_tab_notification, null);
         View view2 = mLi.inflate(R.layout.main_tab_address, null);
         View view3 = mLi.inflate(R.layout.main_tab_friends, null);
         View view4 = mLi.inflate(R.layout.main_tab_settings, null);
@@ -142,15 +171,14 @@ public class MainCommunity extends Activity {
 		            		MainCommunity.this, 
 		                    R.string.app_name, 
 		                    intent, 
-		                    PendingIntent.FLAG_UPDATE_CURRENT);
-    	                        
+		                    PendingIntent.FLAG_UPDATE_CURRENT);    	                         
     	              
 		            notification.setLatestEventInfo(
     	            		 MainCommunity.this,
     	                     body, 
     	                     body, 
     	                     contentIntent);
-    	            mNotificationManager.notify(R.string.app_name, n);
+    	            mNotificationManager.notify(R.string.app_name, notification);
     				break;
     			default:
     				break;
@@ -171,6 +199,31 @@ public class MainCommunity extends Activity {
     	}
     	
         subscribe();
+        
+        mData = new ArrayList<Map<String, Object>>();
+        initListView01Event();
+    }
+    
+	@Override
+    public void onResume(){
+    	super.onResume();
+    	refreshDatatoView();
+    	
+    	try{
+    	Intent intentData = getIntent();
+    	String ret = intentData.getStringExtra("body");
+    	if(!ret.isEmpty()){
+    	        
+    	        Map<String, Object> map = new HashMap<String, Object>();
+				map.put(DataDefine.NUMBER, 1); 
+		        map.put(DataDefine.MATERIALNAME, ret); 
+		        map.put(DataDefine.MATERIALQUANTITY, 1); 
+		        mData.add(map);
+		        adapter.notifyDataSetChanged();
+    	}
+    	}catch(Exception e){
+    		e.printStackTrace();
+    	}
     }
 
     public class MyOnClickListener implements View.OnClickListener {
@@ -179,7 +232,7 @@ public class MainCommunity extends Activity {
         public MyOnClickListener(int i) {
             index = i;
         }
-
+        
         @Override
         public void onClick(View v) {
             mTabPager.setCurrentItem(index);
@@ -271,15 +324,15 @@ public class MainCommunity extends Activity {
                 intent.setClass(MainCommunity.this, Exit.class);
                 startActivity(intent);
             }
-        } else if (keyCode == KeyEvent.KEYCODE_MENU) { 
+        } else if (keyCode == KeyEvent.KEYCODE_MENU) {
             if (!menu_display) {
-                
-                inflater = (LayoutInflater)this.getSystemService(LAYOUT_INFLATER_SERVICE);                
+
+                inflater = (LayoutInflater)this.getSystemService(LAYOUT_INFLATER_SERVICE);
                 layout = inflater.inflate(R.layout.main_menu, null);
 
-                menuWindow = new PopupWindow(layout, LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT); 
+                menuWindow = new PopupWindow(layout, LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT);
                 menuWindow.showAtLocation(this.findViewById(R.id.maincommunity), Gravity.BOTTOM
-                                                                                 | Gravity.CENTER_HORIZONTAL, 0, 0); 
+                                                                                 | Gravity.CENTER_HORIZONTAL, 0, 0);
                 mClose = (LinearLayout)layout.findViewById(R.id.menu_close);
                 mCloseBtn = (LinearLayout)layout.findViewById(R.id.menu_close_btn);
 
@@ -290,7 +343,7 @@ public class MainCommunity extends Activity {
                         Intent intent = new Intent();
                         intent.setClass(MainCommunity.this, Exit.class);
                         startActivity(intent);
-                        menuWindow.dismiss(); 
+                        menuWindow.dismiss();
                     }
                 });
                 menu_display = true;
@@ -319,36 +372,37 @@ public class MainCommunity extends Activity {
         startActivity(intent);
     }
 
-    public void btn_shake(View v) { 
+    public void btn_shake(View v) {
         Intent intent = new Intent(MainCommunity.this, ShakeActivity.class);
         startActivity(intent);
     }
-    
-    
+
     private void subscribe() {
         new Thread() {
-            /* (non-Javadoc)
+            /*
+             * (non-Javadoc)
              * @see java.lang.Thread#run()
              */
             @Override
             public void run() {
                 SessionManager sm = new SessionManager(MainCommunity.this);
-                Map<String,String> headersSetup = new HashMap<String,String>();
+                Map<String, String> headersSetup = new HashMap<String, String>();
                 headersSetup.put("Cookie", "JSESSIONID=".concat(sm.getJSESSIONID()));
-                Stomp stomp = new Stomp("ws://10.148.202.55:8080/community/message", headersSetup, new ListenerWSNetwork() {                    
-                    @Override
-                    public void onState(int state) {
-                        // TODO Auto-generated method stub
-                        
-                    }
-                });
-                
-                Map<String,String> connectHeasers = new HashMap<String,String>();
+                Stomp stomp = new Stomp("ws://10.148.206.109:8080/community/message",
+                                        headersSetup,
+                                        new ListenerWSNetwork() {
+                                            @Override
+                                            public void onState(int state) {
+                                                // TODO Auto-generated method stub
+
+                                            }
+                                        });
+
+                Map<String, String> connectHeasers = new HashMap<String, String>();
                 connectHeasers.put("client-id", sm.getUserDetails().getName());
                 stomp.connect(connectHeasers);
-                
-                
-                Map<String,String> subscribeHeasers = new HashMap<String,String>();
+
+                Map<String, String> subscribeHeasers = new HashMap<String, String>();
                 subscribeHeasers.put("activemq.subscriptionName", sm.getUserDetails().getName());
                 stomp.subscribe(new Subscription("/topic/notification", new ListenerSubscription() {
 
@@ -363,11 +417,140 @@ public class MainCommunity extends Activity {
                           
                         mHandler.sendMessage(msg); // send message to handler to update UI 
                     	//System.out.println(body);
-
+                   
                     }
-                }), subscribeHeasers);
+                }),
+                                subscribeHeasers);
             }
         }.start();
+
+    }
+    
+    private void refreshDatatoView(){
+    	ListView lview = null;
+    	try{
+    	lview = (ListView)view1.findViewById(R.id.listView); //(ListView) findViewById(R.id.listView);
+        }catch(Exception e){
+        	e.printStackTrace();
+        }
+        getData(mData);
+        adapter = new ListviewAdapter(this, mData);
+        lview.setAdapter(adapter);
+    }
+    
+    private List<Map<String, Object>> getData(final List<Map<String, Object>> list) {
+
+        //final List<Map<String, Object>> list = 
+        Map<String, Object> titleMap = new HashMap<String, Object>();
+        titleMap.put(DataDefine.NUMBER, "a"); //this.getString(R.string.material_list_id));
+        titleMap.put(DataDefine.MATERIALNAME, "b"); //this.getString(R.string.material_list_name));
+        titleMap.put(DataDefine.MATERIALQUANTITY, "c"); //this.getString(R.string.material_list_quantity));
+        list.add(titleMap);
         
+        
+        Thread t = new Thread( new Runnable() {
+			public void run() {
+				//WebServiceMaterialProxy materialProxy = new WebServiceMaterialProxy();
+
+				try {
+					//comment out the following statement to test other webservice
+					//userProxy.logoff("67");
+					//comment out the following statement to test other webservice
+					//User appUser = (User)getApplication();
+					//JSONArray array = materialProxy.getMaterialList(appUser.getUserId(), 1, 20);
+					//JSONArray projectList = materialProxy.getMaterialList(appUser.getUserId(), 1, 20);
+					
+					//int count = array.length();
+					int count = 1;
+					for(int i = 0; i< count; ++i){
+				        Map<String, Object> map = new HashMap<String, Object>();
+						map.put(DataDefine.NUMBER, i); //array.getJSONObject(i).getString(DataDefine.MATERIALIDINSERVER));
+				        map.put(DataDefine.MATERIALNAME, i+1); //array.getJSONObject(i).getString(DataDefine.MATERIALNAMEINSERVER));
+				        map.put(DataDefine.MATERIALQUANTITY, i+2); //array.getJSONObject(i).getString(DataDefine.MATERIALQUANTITYINSERVER));
+				        list.add(map);
+					}
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} 
+				
+			}
+			});
+        t.start();
+        try {
+			t.join();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+         
+        return list;
+    }
+    
+
+    public void initListView01Event(){  
+    	ListView lview = null;
+    	try{
+    	lview = (ListView)view1.findViewById(R.id.listView); //(ListView) findViewById(R.id.listView);
+        }catch(Exception e){
+        	e.printStackTrace();
+        }
+        //ListView的item点击事件  
+    	lview.setOnItemClickListener(new OnItemClickListener(){  
+  
+            public void onItemClick(AdapterView<?> parent, View view,  
+                    int position, long id) {  
+        	    ListView listView = (ListView)parent;  
+        	    HashMap<String, String> map = (HashMap<String, String>) listView.getItemAtPosition(position);  
+        	    //need to improve
+        	    Intent intent =new Intent(MainCommunity.this,null);
+            	
+            	Bundle bundle =new Bundle();
+                bundle.putString(DataDefine.NUMBER, map.get(DataDefine.NUMBER));
+                bundle.putString(DataDefine.MATERIALNAME, map.get(DataDefine.MATERIALNAME));
+                bundle.putString(DataDefine.MATERIALQUANTITY, map.get(DataDefine.MATERIALQUANTITY)); 
+                bundle.putString("ACTION", "check");
+                intent.putExtras(bundle);
+                startActivityForResult(intent, 100);
+            }  
+        });  
+          
+    	lview.setOnItemLongClickListener(new OnItemLongClickListener(){  
+  
+            public boolean onItemLongClick(AdapterView<?> parent, View view,  
+                    int position, long id) {  
+
+            	int a = 0;
+            	a =1;
+                return false;  
+            }  
+              
+        });  
+          
+
+    	lview.setOnItemSelectedListener(new OnItemSelectedListener(){  
+
+            public void onItemSelected(AdapterView<?> parent, View view,  
+                    int position, long id) {  
+
+            }  
+  
+            public void onNothingSelected(AdapterView<?> parent) {  
+
+            }  
+              
+        });  
+         
+    	
+        lview.setOnCreateContextMenuListener(new OnCreateContextMenuListener(){
+        	
+            public void onCreateContextMenu(ContextMenu menu, View v,  
+                    ContextMenuInfo menuInfo) {  
+
+                AdapterContextMenuInfo info = (AdapterContextMenuInfo) menuInfo;  
+                int position = info.position;  
+                  
+            }
+        });
     }
 }
