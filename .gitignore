@@ -15,3 +15,5 @@
 /community-common/.project
 /community-mobile-android/*.classpath
 /community-mobile-android/*.project
+/.metadata
+/RemoteSystemsTempFiles
