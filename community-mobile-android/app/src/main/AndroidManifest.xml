@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.autodesk.icp.community.mobile.activity"
+    android:versionCode="1"
+    android:versionName="1.0">
+
+    <uses-sdk
+        android:minSdkVersion="19"
+        android:targetSdkVersion="19" />
+
+    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
+    <uses-permission android:name="android.permission.READ_PROFILE" />
+    <uses-permission android:name="android.permission.READ_CONTACTS" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission
+        android:name="android.permission.READ_EXTERNAL_STORAGE"
+        android:maxSdkVersion="18" />
+
+    <application
+        android:allowBackup="true"
+        android:icon="@drawable/ic_app_logo"
+        android:label="@string/app_name"
+        android:logo="@drawable/ic_app_logo"
+        android:theme="@style/AppTheme"
+        tools:replace="android:icon,android:theme">
+        <activity
+            android:name=".Appstart"
+            android:label="@string/app_name"
+            android:theme="@android:style/Theme.Black.NoTitleBar.Fullscreen">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".NotificationDetails"
+            android:theme="@style/Theme.Slidr.Slidable" />
+
+        <activity
+            android:name=".MainCommunity"
+            android:theme="@style/Anim_style2" />
+
+        <activity
+            android:name=".Login"
+            android:theme="@android:style/Theme.NoTitleBar" />
+
+        <activity
+            android:name=".Exit"
+            android:theme="@style/MyDialogStyle" />
+
+        <activity
+            android:name=".ExitFromSettings"
+            android:theme="@style/MyDialogStyleBottom" />
+
+    </application>
+
+</manifest>

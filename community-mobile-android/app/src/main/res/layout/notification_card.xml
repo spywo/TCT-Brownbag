@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.daimajia.swipe.SwipeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/notifcation_swipeLayout"
+    android:layout_width="match_parent"
+    android:layout_height="80dp">
+    <!-- Bottom View Start-->
+    <LinearLayout
+        android:id="@+id/bottom_wrapper"
+        android:layout_width="80dp"
+        android:layout_height="match_parent"
+        android:background="@color/red"
+        android:orientation="horizontal"
+        android:weightSum="1">
+        <!--What you want to show-->
+        <Button
+            android:id="@+id/notification_delete_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:background="@color/red"
+            android:drawableLeft="@drawable/ic_trash_recyclebin" />
+    </LinearLayout>
+    <!-- Bottom View End-->
+
+    <!-- Surface View Start -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#ffffff"
+        android:padding="10dp">
+
+        <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/item_point_bg">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="#FFFFFF"
+                android:paddingBottom="5dp"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
+                android:paddingTop="5dp">
+
+                <ImageView
+                    android:id="@+id/notification_read_icon"
+                    android:layout_width="20dp"
+                    android:layout_height="55dp"
+                    android:layout_marginRight="5dp" />
+
+                <TextView
+                    android:id="@+id/notification_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_toRightOf="@id/notification_read_icon"
+                    android:textColor="@color/black"
+                    android:textSize="15sp" />
+
+                <TextView
+                    android:id="@+id/notification_desc"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignBottom="@id/notification_read_icon"
+                    android:layout_alignLeft="@id/notification_title"
+                    android:ellipsize="end"
+                    android:singleLine="true"
+                    android:textColor="@color/grey" />
+
+                <TextView
+                    android:id="@+id/notification_time"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:layout_alignTop="@id/notification_title"
+                    android:textColor="@color/grey" />
+            </RelativeLayout>
+        </RelativeLayout>
+    </LinearLayout>
+    <!-- Surface View End -->
+</com.daimajia.swipe.SwipeLayout>
