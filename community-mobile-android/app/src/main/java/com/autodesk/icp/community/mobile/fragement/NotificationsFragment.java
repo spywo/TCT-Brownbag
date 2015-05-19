@@ -40,16 +40,15 @@ public class NotificationsFragment extends Fragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        int position = FragmentPagerItem.getPosition(getArguments());
 
         mRecyclerView = (RecyclerView) view.findViewById(R.id.notification_recycleview);
         mRecyclerView.setItemAnimator(new LandingAnimator());
         mRecyclerView.getItemAnimator().setAddDuration(1000);
-        mRecyclerView.getItemAnimator().setRemoveDuration(1000);
+        mRecyclerView.getItemAnimator().setRemoveDuration(400);
         mRecyclerView.getItemAnimator().setMoveDuration(1000);
         mRecyclerView.getItemAnimator().setChangeDuration(1000);
 
-        NotificationRecyclerViewAdapter recyclerViewAdapter = new NotificationRecyclerViewAdapter(new ArrayList<NotificationCard>());
+        final NotificationRecyclerViewAdapter recyclerViewAdapter = new NotificationRecyclerViewAdapter(new ArrayList<NotificationCard>());
         mRecyclerView.setAdapter(recyclerViewAdapter);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         mRecyclerView.addItemDecoration(new SimpleDividerItemDecoration(getActivity()));
@@ -57,6 +56,14 @@ public class NotificationsFragment extends Fragment {
                 new RecyclerItemClickListener(getActivity(), new RecyclerItemClickListener.OnItemClickListener() {
                     @Override
                     public void onItemClick(View view, final int position) {
+                        for (View childView : view.getTouchables()) {
+                            if (childView.getId() == R.id.notification_delete_button) {
+                                NotificationBadgeManager.getInstance().decrease();
+                                recyclerViewAdapter.remove(recyclerViewAdapter.getItemAtPosition(position));
+                                return;
+                            }
+                        }
+
                         new Handler().post(new Runnable() {
                             @Override
                             public void run() {

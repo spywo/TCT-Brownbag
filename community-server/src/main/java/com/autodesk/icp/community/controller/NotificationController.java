@@ -30,6 +30,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.autodesk.icp.community.common.model.Notification;
+import com.autodesk.icp.community.common.util.Utils;
 
 /**
  * @author Oliver Wu
@@ -42,9 +43,9 @@ public class NotificationController {
     @RequestMapping("/sendmessage")
     public void message() {
         Notification notification = new Notification();
-        notification.setTitle("Dummy");
-        notification.setDescription("HelloWorld");
-        notification.setTimestamp(new Date().toString());
+        notification.setTitle("Change in HR Workways logo");
+        notification.setDescription("Starting from today, you will see a change in the logo on the HRWorkways portal from Aon Hewitt to Excelity. Our payroll processing partner has been acquired by a leading private equity firm and they would now be operating under a new brand name Excelity. This transaction has necessitated a change in the logo on the HRWorkways portal as well. Please note that this change would not affect the services or support in any manner. You can continue to reach out to the email ids mentioned below for any queries that you might have.");
+        notification.setTimestamp(Utils.formatDataInUTC(new Date()));
         template.convertAndSend("/topic/notification", notification);
     }
 }

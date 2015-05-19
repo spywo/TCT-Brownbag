@@ -20,12 +20,39 @@
 // Software Restricted Rights) and DFAR 252.227-7013(c)(1)(ii)
 // (Rights in Technical Data and Computer Software), as applicable.
 //
-package com.autodesk.icp.community.util;
+package com.autodesk.icp.community.common.util;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+import java.util.TimeZone;
 
 /**
  * @author Oliver Wu
  */
 public class Utils {
 
+    private final static SimpleDateFormat FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.S", Locale.CHINESE);
+    static {
+        FORMAT.setTimeZone(TimeZone.getTimeZone("UTC"));
+    }
+
+    public static String formatDataInUTC(Date date) {
+        return FORMAT.format(date);
+    }
+
+    public static String formatDataInUTC(Date date, String formatString) {
+        SimpleDateFormat format = new SimpleDateFormat(formatString, Locale.CHINESE);
+        return format.format(date);
+    }
+
+    public static Date parseDate(String dateString) {
+        Date date = null;
+        try {
+            date = FORMAT.parse(dateString);
+        } catch (ParseException e) {
+        }
+        return date;
+    }
 }
