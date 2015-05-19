@@ -14,12 +14,8 @@ public class Welcome extends Activity {
     }
 
     public void welcome_login(View v) {
-    	try{
         Intent intent = new Intent();
         intent.setClass(Welcome.this, Login.class);
         startActivity(intent);
-    	}catch(Exception e){
-    		e.printStackTrace();
-    	}
     }
 }
