@@ -11,3 +11,5 @@
 /RemoteSystemsTempFiles
 community-server/target/
 community-mobile-android/build/
+community-mobile-android/app/build
+community-mobile-android/app/app.iml
