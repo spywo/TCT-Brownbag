@@ -10,11 +10,13 @@ Its purpose is to connect the peoples in the specific unit(s) and let the people
 
 ##Functionality
 ###Login
-The LADP is used for authenticate the user. Once user has been authenticated and logged in to the application, the re-login is not necessary unless manually logout.  
+The LADP is used for authenticate the user. Once user has been authenticated and logged in to the application, the re-login is not necessary unless manually logout.
+  
 ![Login Screenshot](misc/Login.gif "Login Screenshot")
 
 ###Notification
 User receives the notification any time, which means even s/he is offline, the messages will be delivered once s/he is online.
+
 ![Notification Screenshot](misc/Notification.gif "Notification Screenshot")
 
 ##Acknowledgement
