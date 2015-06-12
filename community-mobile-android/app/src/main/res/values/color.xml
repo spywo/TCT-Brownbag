@@ -36,4 +36,6 @@
         <item>@color/light_green_500</item>
     </integer-array>
 
+    <color name="backColor">#2000</color>
+
 </resources>

@@ -21,5 +21,19 @@
     <string name="warning_up_invalid_incorrect">Username or password incorrect.</string>
     <string name="action_settings">Settings</string>
 
+    <!-- Detail Activity -->
+    <string name="detail_prompt">Comments</string>
+    <string name="detail_enter">Pub</string>
+    <string name="discuss_succeed">发表成功</string>
+    <string name="discuss_fail">发表失败</string>
+    <string name="query_prompt">请输入关键字</string>
+
+    <!-- Menu for Detail -->
+    <string name="DetailsGood">Good</string>
+    <string name="DetailsBed">Nature</string>
+    <string name="DetailsCollect">Favorites</string>
+    <string name="DetailsShare">Register</string>
+    <string name="DetailsDiscuss">Comments</string>
+
 
 </resources>

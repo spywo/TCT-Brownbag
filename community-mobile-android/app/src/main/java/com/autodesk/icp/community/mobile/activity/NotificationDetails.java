@@ -21,9 +21,9 @@ public class NotificationDetails extends ActionBarActivity {
 
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
-            String value = extras.getString("details");
-            TextView detailsTextView = (TextView)findViewById(R.id.notification_details_description);
-            detailsTextView.setText(value);
+            //String value = extras.getString("details");
+            //TextView detailsTextView = (TextView)findViewById(R.id.notification_details_description);
+            //detailsTextView.setText(value);
         }
     }
 

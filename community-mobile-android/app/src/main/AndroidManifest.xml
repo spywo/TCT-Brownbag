@@ -57,6 +57,11 @@
             android:name=".ExitFromSettings"
             android:theme="@style/MyDialogStyleBottom" />
 
+        <service
+            android:name="com.autodesk.icp.community.mobile.util.ReceiverService"
+            android:enabled="true"
+            android:exported="true" >
+        </service>
     </application>
 
 </manifest>

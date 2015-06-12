@@ -34,7 +34,12 @@ public class NotificationRecyclerViewAdapter extends RecyclerView.Adapter<Notifi
 
         viewHolder.mTitleTextView.setText(card.getTitle());
         viewHolder.mDesTextView.setText(card.getDescription());
-        viewHolder.mDateTextView.setText(Utils.formatDataInUTC(Utils.parseDate(card.getTimestamp()),"yyyy-mm-dd"));
+        try {
+            viewHolder.mDateTextView.setText(Utils.formatDataInUTC(Utils.parseDate(card.getTimestamp()), "yyyy-mm-dd"));
+        }catch(Exception e){
+            e.printStackTrace();
+            viewHolder.mDateTextView.setText(card.getTimestamp());
+        }
         if (card.isRead()) {
             viewHolder.setNotificationReaded();
         }
