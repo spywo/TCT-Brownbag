@@ -1,6 +1,7 @@
 package com.autodesk.icp.community.mobile.ui;
 
 public class NotificationCard {
+    private int id;
     private String title;
     private String description;
     private String timestamp;
@@ -16,6 +17,9 @@ public class NotificationCard {
         this.description = description;
         this.timestamp = timestamp;
     }
+
+    public int getId() {return id;}
+    public void setId(int id) {this.id = id;}
 
     public String getTitle() {
         return title;

@@ -12,6 +12,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.autodesk.icp.community.mobile.SQLiteDB.NotificationDao;
+import com.autodesk.icp.community.mobile.SQLiteDB.NotificationService;
 import com.autodesk.icp.community.mobile.activity.NotificationDetails;
 import com.autodesk.icp.community.mobile.activity.R;
 import com.autodesk.icp.community.mobile.ui.NotificationCard;
@@ -76,6 +78,10 @@ public class NotificationsFragment extends Fragment {
 
                                 intent.putExtra("details", nc.getDescription());
                                 startActivity(intent);
+
+                                if (nc.getId() != -11) {
+                                    updateDB(nc.getId());
+                                }
                             }
                         });
                     }
@@ -110,5 +116,12 @@ public class NotificationsFragment extends Fragment {
 
     public NotificationRecyclerViewAdapter getAdpter() {
         return ((NotificationRecyclerViewAdapter) getmRecyclerView().getAdapter());
+    }
+
+    public void updateDB(int id){
+
+        NotificationService nService = new NotificationDao(getActivity().getApplicationContext());
+        Object[] row = {NotificationDao.REDFLAG, id};
+        nService.updateNotification(row);
     }
 }
