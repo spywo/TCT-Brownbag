@@ -57,6 +57,14 @@
             android:name=".ExitFromSettings"
             android:theme="@style/MyDialogStyleBottom" />
 
+        <activity
+            android:name="com.zxing.activity.CaptureActivity"
+            android:configChanges="orientation|keyboardHidden"
+            android:screenOrientation="portrait"
+            android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
+            android:windowSoftInputMode="stateAlwaysHidden" >
+        </activity>
+
         <service
             android:name="com.autodesk.icp.community.mobile.util.ReceiverService"
             android:enabled="true"

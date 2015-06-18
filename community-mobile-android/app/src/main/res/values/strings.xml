@@ -21,6 +21,9 @@
     <string name="warning_up_invalid_incorrect">Username or password incorrect.</string>
     <string name="action_settings">Settings</string>
 
+    <string name="cn_cancel">Cancel</string>
+    <string name="scan_barcode">Scanning</string>
+
     <!-- Detail Activity -->
     <string name="detail_prompt">Comments</string>
     <string name="detail_enter">Pub</string>
