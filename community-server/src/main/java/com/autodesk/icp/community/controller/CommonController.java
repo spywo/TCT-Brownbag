@@ -22,12 +22,58 @@
 //
 package com.autodesk.icp.community.controller;
 
-import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
  * @author Oliver Wu
  */
-@Controller
+@RestController
 public class CommonController {
+    
+    @RequestMapping(value = "/test", method = RequestMethod.GET)    
+    public Person test(@RequestParam( "id" ) Long id) {
+        Person person = new Person();
+        person.setName("zhangsan");
+        person.setPwd("123");
+        return person;
+    }
+}
+
+class Person {
+    private String name;
+    private String pwd;
+
+    /**
+     * @return the name
+     */
+    public String getName() {
+        return name;
+    }
+
+    /**
+     * @param name
+     *            the name to set
+     */
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    /**
+     * @return the pwd
+     */
+    public String getPwd() {
+        return pwd;
+    }
+
+    /**
+     * @param pwd
+     *            the pwd to set
+     */
+    public void setPwd(String pwd) {
+        this.pwd = pwd;
+    }
 
 }
